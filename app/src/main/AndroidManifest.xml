@@ -49,6 +49,10 @@
             android:label="@string/title_activity_map"
             android:theme="@style/FullscreenTheme" >
         </activity>
+        <activity
+            android:name=".ProfileActivity"
+            android:label="@string/title_activity_profile" >
+        </activity>
     </application>
 
 </manifest>
