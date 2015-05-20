@@ -74,4 +74,19 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 		finish();
 	}
+	public void profile(View v){
+		Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+		startActivity(intent);
+		finish();
+	}
+	public void gasNow(View v){
+		Intent intent = new Intent(MainActivity.this, MapActivity.class);
+		startActivity(intent);
+		finish();
+	}
+	public void planRoute(View v){
+		Intent intent = new Intent(MainActivity.this, MapActivity.class);
+		startActivity(intent);
+		finish();
+	}
 }

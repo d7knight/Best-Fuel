@@ -34,6 +34,39 @@
             android:textSize="13dp" />
 
         <Button
+            android:id="@+id/btnPlan"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dip"
+            android:background="@color/btn_logut_bg"
+            android:text="@string/btn_plan"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="15dp"
+            android:onClick="planRoute"/>
+        <Button
+            android:id="@+id/btnGasNow"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dip"
+            android:background="@color/btn_logut_bg"
+            android:text="@string/btn_get_gas_now"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="15dp"
+            android:onClick="gasNow"/>
+        <Button
+            android:id="@+id/btnPlan"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dip"
+            android:background="@color/btn_logut_bg"
+            android:text="@string/btn_profile"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="15dp"
+            android:onClick="profile"/>
+        <Button
             android:id="@+id/btnLogout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -20,5 +20,8 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="btn_plan">Plan a Route</string>
+    <string name="btn_get_gas_now">Get Gas Now</string>
+    <string name="btn_profile">Profile</string>
 
 </resources>
