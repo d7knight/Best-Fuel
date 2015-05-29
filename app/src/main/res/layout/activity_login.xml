@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/bg_login"
+    android:background="@drawable/bluebackgroundb"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="10dp" >
@@ -14,6 +14,11 @@
         android:orientation="vertical"
         android:paddingLeft="20dp"
         android:paddingRight="20dp" >
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bestfuellogo"/>
 
         <EditText
             android:id="@+id/email"
@@ -48,9 +53,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dip"
-            android:background="@color/btn_login_bg"
+            android:background="#0099CC"
             android:text="@string/btn_login"
-            android:textColor="@color/btn_login" />
+            android:textColor="@color/btn_login_bg" />
 
         <!-- Link to Login Screen -->
 

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CarQuery</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <script type="text/javascript" src="http://www.carqueryapi.com/js/jquery.min.js"></script>
+    <script type="text/javascript" src="http://www.carqueryapi.com/js/carquery.0.3.3.js"></script>
+    <script type="text/javascript">
+        var carquery;
+        $(document).ready(
+            function(){
+            console.log("loading car query");
+            carquery = new CarQuery();
+            carquery.init();
+            Android.initd("Awesomesauce");
+            //console.log("cq 1 "+ carquery);
+
+            });
+        function getYears() {
+            $.getJSON(carquery.base_url+"?callback=?", {cmd:"getYears"}, function(data) {
+                var retObj= data;
+                JSON.stringify(retObj);
+                //console.log("years result " + data.Years.min_year);
+                Android.getYearsRet(JSON.stringify(retObj));
+            });
+        }
+
+        function getMakes(givYear) {
+            //console.log("getMakes years "+ givYear);
+            //console.log("getMakes years "+ givYear.toString());
+            //var s = givYear.toString();
+            $.getJSON(carquery.base_url+"?callback=?", {cmd:"getMakes", year:givYear.toString()}, function(data) {
+                var retObj= data.Makes;
+                //console.log("makes result " + JSON.stringify(retObj));
+                Android.getMakesRet(JSON.stringify(retObj));
+            });
+        }
+
+        function getModels(givMake, givYear) {
+            $.getJSON(carquery.base_url+"?callback=?", {cmd:"getModels", make:givMake.toString(), year:givYear.toString()}, function(data) {
+                var retObj= data.Models;
+                Android.getModelsRet(JSON.stringify(retObj));
+            });
+        }
+
+        function getData(givMake, givYear, givModel, sparse) {
+            $.getJSON(carquery.base_url+"?callback=?", {cmd:"getTrims", make:givMake.toString(), year:givYear.toString(), model:givModel.toString(), full_results:sparse.toString()}, function(data) {
+                var retObj= data.Trims;
+                Android.getModelsRet(JSON.stringify(retObj));
+            });
+        }
+
+        function getVehicle(vehicleID) {
+            $.getJSON(carquery.base_url+"?callback=?", {cmd:"getModel", make:vehicleID.toString()}, function(data) {
+                var retObj= data;
+                Android.getVehicleRet(JSON.stringify(retObj));
+            });
+        }
+
+    </script>
+</head>
+<body>
+</body>
+</html>
