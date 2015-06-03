@@ -9,6 +9,7 @@ import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
+import com.example.cs446project.bestfuel.helper.StationAlgorithm;
 
 
 public class ProfileActivity extends Activity {
@@ -38,7 +39,11 @@ public class ProfileActivity extends Activity {
         Log.d("CQ", "running test call");
         Object retObj=null;
         //getYears(retObj);
-        cq.getMakes(2009);
+        //cq.getMakes(2009);
+        //temp stuff for testing
+        Log.d("Testing", "About to open sa");
+        StationAlgorithm sa = new StationAlgorithm();
+        Log.d("Testing", "right after sa");
     }
 
     public class CQInterface {

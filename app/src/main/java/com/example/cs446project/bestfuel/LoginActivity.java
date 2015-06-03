@@ -30,6 +30,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.example.cs446project.bestfuel.helper.StationAlgorithm;
 
 public class LoginActivity extends Activity {
 	// LogCat tag
@@ -127,6 +128,10 @@ public class LoginActivity extends Activity {
 								// user successfully logged in
 								// Create login session
 								session.setLogin(true);
+
+
+
+
 
 								// Launch main activity
 								Intent intent = new Intent(LoginActivity.this,
