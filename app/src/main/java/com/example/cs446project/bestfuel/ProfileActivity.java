@@ -41,9 +41,6 @@ public class ProfileActivity extends Activity {
         //getYears(retObj);
         //cq.getMakes(2009);
         //temp stuff for testing
-        Log.d("Testing", "About to open sa");
-        StationAlgorithm sa = new StationAlgorithm();
-        Log.d("Testing", "right after sa");
     }
 
     public class CQInterface {

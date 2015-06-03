@@ -9,6 +9,7 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.example.cs446project.bestfuel.MapActivity;
 import com.example.cs446project.bestfuel.app.AppConfig;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
@@ -31,19 +32,24 @@ public class StationAlgorithm{
 
     //global data list
     ArrayList<StationData> stationList = new ArrayList<StationData>();
+    public String result;
     int bestStationIndex;
     private int rad=5;
     private double curLat;
     private double curLon;
     private String curGrade;
+    MapActivity curAct;
 
     //constructor
-    public StationAlgorithm() {
+    public StationAlgorithm(MapActivity curAct) {
         // Progress dialog
         //testing this out
         //getPrices(51.5033630,-0.1276250, 10, "Regular"); //near me
         //getData(40.3532924, -79.8307726, 10, "Regular"); //For testing
-        findBestStation(40.3532924, -79.8307726);
+        //findBestStation(40.3532924, -79.8307726);
+
+
+        this.curAct=curAct;
     }
 
     //this is function that map would call
@@ -98,7 +104,7 @@ public class StationAlgorithm{
                         StationData tempSD = new StationData(id, name, address, lat, lon, phone, area, created, updated, grade, price, fuelUpdate, distance);
                         stationList.add(tempSD);
                     }
-
+                    result= js.toString();
                     dbCallback(Integer.parseInt(js.getString("result_set_size")));
 
                 } catch (JSONException e) {
@@ -148,6 +154,7 @@ public class StationAlgorithm{
                 }
             }
             Log.d("DBTest", "best station is "+bestStationIndex);
+            this.curAct.stationBypass(bestStationIndex);
         }
     }
 
