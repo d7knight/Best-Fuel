@@ -16,10 +16,14 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import com.example.cs446project.bestfuel.helper.StationAlgorithm;
+import com.example.cs446project.bestfuel.helper.StationData;
+
 
 public class MapActivity extends Activity {
-
-
+    static WebAppInterface waInterface;
+    Boolean saCreated=false;
+    StationAlgorithm sa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,20 +35,34 @@ public class MapActivity extends Activity {
         WebView webview=(WebView)findViewById(R.id.webkit);
         webview.getSettings().setJavaScriptEnabled(true);
         //Inject WebAppInterface methods into Web page by having Interface name 'Android'
-        webview.addJavascriptInterface(new WebAppInterface(this), "Android");
+        waInterface = new WebAppInterface(this, webview);
+        webview.addJavascriptInterface(waInterface, "Android");
         //Load URL inside WebView
 
+
+        if(saCreated==false) {
+            MapActivity curAct = this;
+            sa = new StationAlgorithm(curAct);
+            saCreated = true;
+        }
+
         webview.loadUrl("file:///android_asset/map.html");
+    }
+
+    public void stationBypass(int bestStation){
+        waInterface.sendStationResult(this.sa.result, bestStation);
     }
 
 
     //Class to be injected in Web page
     public class WebAppInterface {
         Context mContext;
+        WebView webview;
 
         /** Instantiate the interface and set the context */
-        WebAppInterface(Context c) {
+        WebAppInterface(Context c, WebView webview) {
             mContext = c;
+            this.webview=webview;
         }
 
         /**
@@ -113,6 +131,18 @@ public class MapActivity extends Activity {
                     });
             // Showing Alert Message
             alertDialog.show();
+        }
+
+        @JavascriptInterface
+        public void sendStationResult(String result, int bestStation){
+            //send it to the map javascript
+
+            webview.loadUrl("javascript:sendStationResult("+result+","+bestStation+")");
+        }
+
+        @JavascriptInterface
+        public void findBestStation(double lat, double lon){
+            sa.findBestStation(lat, lon);
         }
     }
 
