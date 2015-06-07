@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.cs446project.bestfuel.app.AppConfig;
 
+import com.example.cs446project.bestfuel.helper.MyLocation;
 import com.example.cs446project.bestfuel.helper.StationAlgorithm;
 
 import java.security.Provider;
@@ -31,16 +32,18 @@ public class MapActivity extends Activity {
     StationAlgorithm sa;
     Location location;
 
-    String myProvider;
     LocationManager locationManager;
     LocationListener locationListener;
+    Context mContext;
 
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        mContext=this;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -51,44 +54,16 @@ public class MapActivity extends Activity {
                 .getSystemService(Context.LOCATION_SERVICE);
         requestGPS(locationManager);
 
-       locationListener = new LocationListener() {
-
+        MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                Toast.makeText(MapActivity.this,
-                        "Provider enabled: " + provider, Toast.LENGTH_SHORT)
-                        .show();
-                myProvider=provider;
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-                Toast.makeText(MapActivity.this,
-                        "Provider disabled: " + provider, Toast.LENGTH_SHORT)
-                        .show();
-                myProvider="";
-            }
-
-            @Override
-            public void onLocationChanged(Location location) {
-                // Do work with new location. Implementation of this method will be covered later.
-                doWorkWithNewLocation(location);
+            public void gotLocation(Location location){
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
             }
         };
-
-        long minTime = 5 * 1000; // Minimum time interval for update in seconds, i.e. 5 seconds.
-        long minDistance = 10; // Minimum distance change for update in meters, i.e. 10 meters.
-
-// Assign LocationListener to LocationManager in order to receive location updates.
-// Acquiring provider that is used for location updates will also be covered later.
-// Instead of LocationListener, PendingIntent can be assigned, also instead of
-// provider name, criteria can be used, but we won't use those approaches now.
-        locationManager.requestLocationUpdates(getProviderName(), minTime,
-                minDistance, locationListener);
+        MyLocation myLocation = new MyLocation();
+        myLocation.getLocation(this, locationResult);
 
 
         WebView webview=(WebView)findViewById(R.id.webkit);
@@ -98,10 +73,8 @@ public class MapActivity extends Activity {
         webview.addJavascriptInterface(waInterface, "Android");
         //Load URL inside WebView
 
-        myProvider = LocationManager.NETWORK_PROVIDER;
 
-        // Returns last known location, this is the fastest way to get a location fix.
-        Location fastLocation = locationManager.getLastKnownLocation(myProvider);
+
 
 
         if(saCreated==false) {
@@ -159,63 +132,7 @@ public class MapActivity extends Activity {
 
     }
 
-    /**
-     * Make use of location after deciding if it is better than previous one.
-     *
-     * @param newlocation Newly acquired location.
-     */
-    void doWorkWithNewLocation(Location newlocation) {
-        if(isBetterLocation(location, newlocation)){
-            // If location is better, do some user preview.
-            Toast.makeText(MapActivity.this,
-                    "Better location found: " + myProvider, Toast.LENGTH_SHORT)
-                    .show();
-        }
 
-        location=newlocation;
-    }
-
-    /**
-     * Time difference threshold set for one minute.
-     */
-    static final int TIME_DIFFERENCE_THRESHOLD = 1 * 60 * 1000;
-
-    /**
-     * Decide if new location is better than older by following some basic criteria.
-     * This algorithm can be as simple or complicated as your needs dictate it.
-     * Try experimenting and get your best location strategy algorithm.
-     *
-     * @param oldLocation Old location used for comparison.
-     * @param newLocation Newly acquired location compared to old one.
-     * @return If new location is more accurate and suits your criteria more than the old one.
-     */
-    boolean isBetterLocation(Location oldLocation, Location newLocation) {
-        // If there is no old location, of course the new location is better.
-        if(oldLocation == null) {
-            return true;
-        }
-
-        // Check if new location is newer in time.
-        boolean isNewer = newLocation.getTime() > oldLocation.getTime();
-
-        // Check if new location more accurate. Accuracy is radius in meters, so less is better.
-        boolean isMoreAccurate = newLocation.getAccuracy() < oldLocation.getAccuracy();
-        if(isMoreAccurate && isNewer) {
-            // More accurate and newer is always better.
-            return true;
-        } else if(isMoreAccurate && !isNewer) {
-            // More accurate but not newer can lead to bad fix because of user movement.
-            // Let us set a threshold for the maximum tolerance of time difference.
-            long timeDifference = newLocation.getTime() - oldLocation.getTime();
-
-            // If time difference is not greater then allowed threshold we accept it.
-            if(timeDifference > -TIME_DIFFERENCE_THRESHOLD) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public void stationBypass(int bestStation){
         waInterface.sendStationResult(this.sa.result, bestStation);
@@ -331,7 +248,7 @@ public class MapActivity extends Activity {
             else{
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-              //  Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+               Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
                 webview.loadUrl("javascript:sendCurLocation(" + latitude + "," + longitude + ")");
             }
            locationManager.removeUpdates(locationListener);
