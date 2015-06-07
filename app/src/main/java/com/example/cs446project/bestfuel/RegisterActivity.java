@@ -31,7 +31,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
-public class RegisterActivity extends Activity {
+public class  RegisterActivity extends Activity {
 	private static final String TAG = RegisterActivity.class.getSimpleName();
 	private Button btnRegister;
 	private Button btnLinkToLogin;
