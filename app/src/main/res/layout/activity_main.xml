@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bluebackgroundb"
     tools:context="${relativePackage}.${activityClass}" >
 
     <LinearLayout
@@ -12,6 +13,11 @@
         android:layout_marginRight="20dp"
         android:gravity="center"
         android:orientation="vertical" >
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bestfuellogo" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -55,12 +61,22 @@
             android:textColor="@color/white"
             android:textSize="15dp"
             android:onClick="gasNow"/>
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="2"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
         <Button
             android:id="@+id/btnPlan"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dip"
+            android:layout_weight="1"
             android:background="@color/btn_logut_bg"
+            android:layout_marginRight="2dp"
             android:text="@string/btn_profile"
             android:textAllCaps="false"
             android:textColor="@color/white"
@@ -68,14 +84,14 @@
             android:onClick="profile"/>
         <Button
             android:id="@+id/btnLogout"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dip"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp"
             android:background="@color/btn_logut_bg"
             android:text="@string/btn_logout"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="15dp" />
     </LinearLayout>
-
 </RelativeLayout>
