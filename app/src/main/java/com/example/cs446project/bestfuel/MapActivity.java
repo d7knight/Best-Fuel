@@ -33,7 +33,6 @@ public class MapActivity extends Activity {
     Location location;
 
     LocationManager locationManager;
-    LocationListener locationListener;
     Context mContext;
 
 
@@ -56,7 +55,8 @@ public class MapActivity extends Activity {
 
         MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
             @Override
-            public void gotLocation(Location location){
+            public void gotLocation(Location newLocation){
+                location=newLocation;
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
@@ -84,26 +84,6 @@ public class MapActivity extends Activity {
         }
         webview.clearCache(true);
         webview.loadUrl(AppConfig.URL_MAP);
-    }
-    /**
-     * Get provider name.
-     * @return Name of best suiting provider.
-     * */
-    String getProviderName() {
-        LocationManager locationManager = (LocationManager) this
-                .getSystemService(Context.LOCATION_SERVICE);
-
-        Criteria criteria = new Criteria();
-        criteria.setPowerRequirement(Criteria.POWER_LOW); // Chose your desired power consumption level.
-        criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
-        criteria.setSpeedRequired(false); // Chose if speed for first location fix is required.
-        criteria.setAltitudeRequired(false); // Choose if you use altitude.
-        criteria.setBearingRequired(false); // Choose if you use bearing.
-        criteria.setCostAllowed(false); // Choose if this provider can waste money :-)
-
-        // Provide your criteria and flag enabledOnly that tells
-        // LocationManager only to return active providers.
-        return locationManager.getBestProvider(criteria, true);
     }
 
     private void requestGPS(LocationManager lm){
@@ -219,10 +199,15 @@ public class MapActivity extends Activity {
         }
 
         @JavascriptInterface
-        public void sendStationResult(String result, int bestStation){
+        public void sendStationResult(final String result, final int bestStation){
             //send it to the map javascript
+            webview.post(new Runnable() {
+                @Override
+                public void run() {
+                    webview.loadUrl("javascript:sendStationResult('" + result + "','" + bestStation + "')");
+                }
+            });
 
-            webview.loadUrl("javascript:sendStationResult(" + result + "," + bestStation + ")");
         }
 
         @JavascriptInterface
@@ -234,8 +219,9 @@ public class MapActivity extends Activity {
         @JavascriptInterface
         public void requestCurLocation(){
 
-            Log.d("GPS","Android side gps request received");
+            Log.d("GPS", "Android side gps request received");
             sendCurLocation();
+
         }
 
         @JavascriptInterface
@@ -244,14 +230,22 @@ public class MapActivity extends Activity {
 
             if(location==null){
                 Log.d("gps","error");
+                Toast.makeText(mContext, "Javascript requested location but location not ready yet", Toast.LENGTH_SHORT).show();
             }
             else{
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-               Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
-                webview.loadUrl("javascript:sendCurLocation(" + latitude + "," + longitude + ")");
+                final double latitude = location.getLatitude();
+                final double longitude = location.getLongitude();
+              //  Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+
+                webview.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        webview.loadUrl("javascript:sendCurLocation('" + latitude + "','" + longitude + "')");
+                    }
+                });
+
             }
-           locationManager.removeUpdates(locationListener);
+
         }
     }
 
