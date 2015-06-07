@@ -9,4 +9,7 @@ public class AppConfig {
 
 	// Gas Station data api
 	public static String URL_STATIONS = "http://www.cs446project.5gb.co/android_login_api/";
+
+	// Gas Station map
+	public static String URL_MAP = "http://www.cs446project.5gb.co/";
 }

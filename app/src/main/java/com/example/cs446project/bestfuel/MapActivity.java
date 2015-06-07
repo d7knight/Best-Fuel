@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -47,6 +49,7 @@ public class MapActivity extends Activity {
         // Don't initialize location manager, retrieve it from system services.
          locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);
+        requestGPS(locationManager);
 
        locationListener = new LocationListener() {
 
@@ -129,10 +132,37 @@ public class MapActivity extends Activity {
         // LocationManager only to return active providers.
         return locationManager.getBestProvider(criteria, true);
     }
+
+    private void requestGPS(LocationManager lm){
+        boolean enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!enabled){
+            Log.d("GPS", "Gps is not enabled");
+            new AlertDialog.Builder(this)
+                    .setTitle("Enable GPS")
+                    .setMessage("Would you like to enable GPS to get current location?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else {
+            Log.d("GPS", "Gps is enabled");
+        }
+
+    }
+
     /**
      * Make use of location after deciding if it is better than previous one.
      *
-     * @param location Newly acquired location.
+     * @param newlocation Newly acquired location.
      */
     void doWorkWithNewLocation(Location newlocation) {
         if(isBetterLocation(location, newlocation)){
@@ -301,9 +331,10 @@ public class MapActivity extends Activity {
             else{
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+                webview.loadUrl("javascript:sendCurLocation(" + latitude + "," + longitude + ")");
             }
-           // locationManager.removeUpdates(locationListener);
+           locationManager.removeUpdates(locationListener);
         }
     }
 
