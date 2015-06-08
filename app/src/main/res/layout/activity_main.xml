@@ -3,25 +3,29 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/bluebackgroundb"
-    tools:context="${relativePackage}.${activityClass}" >
+    tools:context="${relativePackage}.${activityClass}">
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_centerInParent="true"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:gravity="center"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:weightSum="1">
 
         <ImageView
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/bestfuellogo" />
+            android:src="@drawable/bestfuellogo"
+            android:layout_marginTop="-50dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-40dp"
             android:text="@string/welcome"
             android:textSize="20dp" />
 
@@ -31,65 +35,93 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:textColor="@color/lbl_name"
-            android:textSize="24dp" />
-
-        <TextView
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="13dp" />
+            android:textSize="24dp"
+            android:layout_marginBottom="10dp" />
 
         <Button
             android:id="@+id/btnPlan"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dip"
-            android:background="@color/btn_logut_bg"
+            android:background="#0099CC"
+            android:onClick="planRoute"
             android:text="@string/btn_plan"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="15dp"
-            android:onClick="planRoute"/>
+            android:layout_alignBottom="@+id/btnPlanImage"
+            android:elevation="0dp" />
+
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:id="@+id/btnplanimage"
+            android:src="@drawable/googlemaps"
+            android:layout_gravity="left"
+            android:layout_marginTop="-66dp"
+            android:elevation="2dp"
+            android:focusableInTouchMode="true"
+            android:longClickable="true"
+            android:layout_marginLeft="-4dp"
+            android:adjustViewBounds="false" />
+
         <Button
             android:id="@+id/btnGasNow"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dip"
-            android:background="@color/btn_logut_bg"
+            android:background="#0099CC"
+            android:onClick="gasNow"
             android:text="@string/btn_get_gas_now"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="15dp"
-            android:onClick="gasNow"/>
+            android:elevation="0dp" />
+
+        <ImageView
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:id="@+id/btngasimage"
+            android:src="@drawable/fuel"
+            android:layout_gravity="bottom|left"
+            android:layout_marginTop="-70dp"
+            android:elevation="2dp"
+            android:focusableInTouchMode="true"
+            android:longClickable="false"
+            android:layout_marginLeft="-7dp" />
 
 
     </LinearLayout>
+
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:weightSum="2"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
+        android:weightSum="2">
+
         <Button
-            android:id="@+id/btnPlan"
+            android:id="@+id/btnProfile"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/btn_logut_bg"
             android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="#0099CC"
+            android:onClick="profile"
             android:text="@string/btn_profile"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="15dp"
-            android:onClick="profile"/>
+            android:textSize="15dp" />
+
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginLeft="2dp"
-            android:background="@color/btn_logut_bg"
-            android:text="@string/btn_logout"
+            android:layout_weight="1"
+            android:background="#0099CC"
+            android:text="Logout"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="15dp" />
