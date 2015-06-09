@@ -5,11 +5,20 @@ import com.example.cs446project.bestfuel.helper.SessionManager;
 
 import java.util.HashMap;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Gallery;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -48,7 +57,7 @@ public class MainActivity extends Activity {
 
 		// Displaying the user details on the screen
 		txtName.setText(name);
-		txtEmail.setText(email);
+		//txtEmail.setText(email);
 
 		// Logout button click event
 		btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +68,8 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
+
+
 
 	/**
 	 * Logging out the user. Will set isLoggedIn flag to false in shared
