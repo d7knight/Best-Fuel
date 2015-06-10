@@ -24,7 +24,7 @@
     <string name="btn_get_gas_now">Get Gas Now</string>
     <string name="btn_profile">Profile</string>
 
-    <string name="info">info</string>
+    <string name="info">username</string>
     <string name="make">Make</string>
     <string name="model">Model</string>
     <string name="year">Year</string>
