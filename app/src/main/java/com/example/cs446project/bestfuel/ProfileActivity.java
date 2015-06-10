@@ -2,17 +2,29 @@ package com.example.cs446project.bestfuel;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.TextView;
 
+
+import com.example.cs446project.bestfuel.helper.SQLiteHandler;
+import com.example.cs446project.bestfuel.helper.SessionManager;
 import com.example.cs446project.bestfuel.helper.StationAlgorithm;
+
+import java.util.HashMap;
 
 
 public class ProfileActivity extends Activity {
+
+    private TextView txtInfo;
+    private SQLiteHandler db;
+    private SessionManager session;
 
     CQInterface cq;
     @Override
@@ -23,6 +35,35 @@ public class ProfileActivity extends Activity {
         
         setContentView(R.layout.activity_profile);
 
+        txtInfo = (TextView) findViewById(R.id.info);
+
+        // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+
+        // session manager
+        session = new SessionManager(getApplicationContext());
+
+        if (!session.isLoggedIn()) {
+            logoutUser();
+        }
+
+        // Fetching user details from sqlite
+        HashMap<String, String> user = db.getUserDetails();
+
+        String name = user.get("name");
+        String email = user.get("email");
+
+        // Displaying the user details on the screen
+        txtInfo.setText(name);
+
+        android.widget.Spinner dropdown = (android.widget.Spinner)findViewById(R.id.year);
+        String[] items = new String[]{"2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002",
+                "2001", "2000", "1999", "1998", "1997", "1996", "1995", "1994", "1993", "1992", "1991", "1990", "1989", "1988", "1987", "1986", "1985"
+                , "1984", "1983", "1982", "1981", "1980", "1979", "1978", "1977", "1976", "1975", "1974", "1973", "1972", "1971", "1970", "1969", "1968"};
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
+        dropdown.setAdapter(adapter);
+
+
         //testing carquery stuff
         WebView webview = (WebView)findViewById(R.id.webview);
         webview.getSettings().setJavaScriptEnabled(true);
@@ -32,7 +73,17 @@ public class ProfileActivity extends Activity {
         webview.loadUrl("file:///android_asset/carquery.html");
 
         Log.d("CQ", "past init");
+    }
 
+    private void logoutUser() {
+        session.setLogin(false);
+
+        db.deleteUsers();
+
+        // Launching the login activity
+        Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public void testCall(View v){
