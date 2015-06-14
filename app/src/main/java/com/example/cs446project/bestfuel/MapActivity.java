@@ -74,6 +74,7 @@ public class MapActivity extends Activity {
         //Load URL inside WebView
 
 
+        Log.d("Main", "Main activity loaded");
 
 
 
@@ -246,6 +247,12 @@ public class MapActivity extends Activity {
 
             }
 
+        }
+
+        @JavascriptInterface
+        public void switchToProfile() {
+            Intent intent = new Intent(MapActivity.this, ProfileActivity.class);
+            startActivity(intent);
         }
     }
 

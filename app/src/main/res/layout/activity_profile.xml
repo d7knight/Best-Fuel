@@ -18,24 +18,71 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/bluebackgroundb"
-        android:gravity="center"
+        android:gravity="top"
         android:orientation="vertical"
-        android:padding="10dp" >
+        android:padding="10dp"
+        android:weightSum="1">
 
-        <ImageView
+        <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/bestfuellogo"/>
+            android:background="#FFFFFF"
+            android:layout_marginBottom="20dp">
+            
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/profile"
+                android:layout_gravity="left"
+                android:layout_marginLeft="10dp"/>
 
-        <TextView
-            android:id="@+id/info"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/profileName"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:text=""
+                android:padding="10dp"
+                android:gravity="right"/>
+
+            <TextView
+                android:id="@+id/profileEmail"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:text=""
+                android:padding="10dp"
+                android:layout_marginTop="25dp"
+                android:gravity="right"/>
+
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="-40dp"
-            android:text="@string/info"
-            android:layout_marginBottom="10dp"
-            android:textSize="30dp" />
+            android:background="#FFFFFF"
+            android:layout_marginBottom="10dp">
+
+            <ImageView
+                android:id="@+id/plusCarImage"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/plus"
+                android:layout_gravity="left"
+                android:layout_marginLeft="22dp"
+                android:layout_marginTop="2dp"/>
+
+            <TextView
+                android:id="@+id/addCar"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:text="Add A Vehicle"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:gravity="center"/>
+
+
+        </FrameLayout>
 
         <EditText
             android:id="@+id/make"

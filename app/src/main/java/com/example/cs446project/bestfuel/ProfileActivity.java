@@ -35,8 +35,6 @@ public class ProfileActivity extends Activity {
         
         setContentView(R.layout.activity_profile);
 
-        txtInfo = (TextView) findViewById(R.id.info);
-
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
 
@@ -50,11 +48,18 @@ public class ProfileActivity extends Activity {
         // Fetching user details from sqlite
         HashMap<String, String> user = db.getUserDetails();
 
+        //Profile Data ========================================
         String name = user.get("name");
         String email = user.get("email");
 
-        // Displaying the user details on the screen
-        txtInfo.setText(name);
+        TextView nameTxt = (TextView) findViewById(R.id.profileName);
+        nameTxt.setText(name);
+
+        TextView emailTxt = (TextView) findViewById(R.id.profileEmail);
+        emailTxt.setText(email);
+
+        //Profile end ========================================
+
 
         android.widget.Spinner dropdown = (android.widget.Spinner)findViewById(R.id.year);
         String[] items = new String[]{"2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002",
@@ -72,6 +77,11 @@ public class ProfileActivity extends Activity {
         webview.loadUrl("file:///android_asset/carquery.html");
 
         Log.d("CQ", "past init");
+    }
+
+    //storing years in the database so we don't have to wait for loading
+    private void storeYears(){
+
     }
 
     private void logoutUser() {

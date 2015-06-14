@@ -91,6 +91,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		// Move to first row
 		cursor.moveToFirst();
+		//Log.d(TAG, "Cursor is testing: " + cursor.getString(0));
 		if (cursor.getCount() > 0) {
 			user.put("name", cursor.getString(1));
 			user.put("email", cursor.getString(2));
@@ -131,5 +132,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
 		Log.d(TAG, "Deleted all user info from sqlite");
 	}
+
+
 
 }

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -40,6 +41,7 @@ public class MainActivity extends Activity {
 			logoutUser();
 		}
 
+		Log.d("Main", "DB rows: "+db.getRowCount());
 		// Fetching user details from sqlite
 		HashMap<String, String> user = db.getUserDetails();
 

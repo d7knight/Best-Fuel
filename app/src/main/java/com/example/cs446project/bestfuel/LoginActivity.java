@@ -7,6 +7,7 @@ package com.example.cs446project.bestfuel;
 
 import com.example.cs446project.bestfuel.app.AppConfig;
 import com.example.cs446project.bestfuel.app.AppController;
+import com.example.cs446project.bestfuel.helper.SQLiteHandler;
 import com.example.cs446project.bestfuel.helper.SessionManager;
 
 import java.util.HashMap;
@@ -61,6 +62,7 @@ public class LoginActivity extends Activity {
 
 		// Check if user is already logged in or not
 		if (session.isLoggedIn()) {
+			Log.d("Login", "user already logged in");
 			// User is already logged in. Take him to main activity
 			Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 			startActivity(intent);
@@ -129,8 +131,7 @@ public class LoginActivity extends Activity {
 								// Create login session
 								session.setLogin(true);
 
-
-
+								addUser(jObj);
 
 
 								// Launch main activity
@@ -186,5 +187,21 @@ public class LoginActivity extends Activity {
 	private void hideDialog() {
 		if (pDialog.isShowing())
 			pDialog.dismiss();
+	}
+
+	private void addUser(JSONObject response){
+		SQLiteHandler db;
+		db = new SQLiteHandler(getApplicationContext());
+		try {
+			String uid = response.getString("uid");
+
+			JSONObject user = response.getJSONObject("user");
+			String name = user.getString("name");
+			String email = user.getString("email");
+			String created_at = user.getString("created_at");
+			db.addUser(name, email, uid, created_at);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }
