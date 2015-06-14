@@ -19,7 +19,7 @@
             });
         function getYears() {
             $.getJSON(carquery.base_url+"?callback=?", {cmd:"getYears"}, function(data) {
-                var retObj= data;
+                var retObj= data.Years;
                 JSON.stringify(retObj);
                 //console.log("years result " + data.Years.min_year);
                 Android.getYearsRet(JSON.stringify(retObj));

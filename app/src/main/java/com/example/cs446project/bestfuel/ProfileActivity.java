@@ -1,15 +1,24 @@
 package com.example.cs446project.bestfuel;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.DialogPreference;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
@@ -17,6 +26,11 @@ import com.example.cs446project.bestfuel.helper.SQLiteHandler;
 import com.example.cs446project.bestfuel.helper.SessionManager;
 import com.example.cs446project.bestfuel.helper.StationAlgorithm;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -25,6 +39,10 @@ public class ProfileActivity extends Activity {
     private TextView txtInfo;
     private SQLiteHandler db;
     private SessionManager session;
+    private ArrayList<String> carYears = new ArrayList<String>();
+    private View inflated;
+    private Spinner yearSpin;
+    private ProgressDialog pDialog;
 
     CQInterface cq;
     @Override
@@ -45,6 +63,9 @@ public class ProfileActivity extends Activity {
             logoutUser();
         }
 
+        pDialog = new ProgressDialog(this);
+        pDialog.setCancelable(false);
+
         // Fetching user details from sqlite
         HashMap<String, String> user = db.getUserDetails();
 
@@ -60,13 +81,20 @@ public class ProfileActivity extends Activity {
 
         //Profile end ========================================
 
+        //Add car button
+        FrameLayout addFrame = (FrameLayout) findViewById(R.id.addFrame);
+        addFrame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("CarFrame", "Clicked on add a car");
+                addCarDialogue(inflated);
+                cq.getYears();
+            }
+        });
 
-        android.widget.Spinner dropdown = (android.widget.Spinner)findViewById(R.id.year);
-        String[] items = new String[]{"2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002",
-                "2001", "2000", "1999", "1998", "1997", "1996", "1995", "1994", "1993", "1992", "1991", "1990", "1989", "1988", "1987", "1986", "1985"
-                , "1984", "1983", "1982", "1981", "1980", "1979", "1978", "1977", "1976", "1975", "1974", "1973", "1972", "1971", "1970", "1969", "1968"};
-        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
-        dropdown.setAdapter(adapter);
+
+
+
 
         //testing carquery stuff
         WebView webview = (WebView)findViewById(R.id.webview);
@@ -76,13 +104,13 @@ public class ProfileActivity extends Activity {
 
         webview.loadUrl("file:///android_asset/carquery.html");
 
-        Log.d("CQ", "past init");
+
+        inflated = getLayoutInflater().inflate(R.layout.vehicle_layout, null);
+        yearSpin = (Spinner) inflated.findViewById(R.id.year);
+
+        //cq.getYears();
     }
 
-    //storing years in the database so we don't have to wait for loading
-    private void storeYears(){
-
-    }
 
     private void logoutUser() {
         session.setLogin(false);
@@ -95,13 +123,35 @@ public class ProfileActivity extends Activity {
         finish();
     }
 
-    public void testCall(View v){
-        Log.d("CQ", "running test call");
-        Object retObj=null;
-        //getYears(retObj);
-        //cq.getMakes(2009);
-        //temp stuff for testing
+
+    public void addCarDialogue(View inflated){
+
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(inflated);
+        dialog.setTitle("Add A Vehicle");
+
+        dialog.show();
     }
+
+    private void adjustYearSpinner(ArrayList<String> years){
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_item, years);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        yearSpin.setAdapter(adapter);
+    }
+
+
+
+    //Loading dialog stuff
+    private void showDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    private void hideDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
+    }
+
 
     public class CQInterface {
         Context context;
@@ -130,6 +180,9 @@ public class ProfileActivity extends Activity {
         //returns the range of all possible years for vehicles
         @JavascriptInterface
         public void getYears(){
+            Log.d("CarQuery", "Calling getYears");
+            pDialog.setMessage("Fetching Vehicle Years ...");
+            showDialog();
             webview.loadUrl("javascript:getYears()");
         }
 
@@ -138,6 +191,29 @@ public class ProfileActivity extends Activity {
         public void getYearsRet(String retObj) {
 
             Log.d("CQ", "the actual retobj is " + retObj);
+
+            final ArrayList<String> years = new ArrayList<String>();
+            JSONObject jObj = null;
+            int start=0;
+            int end=0;
+            try {
+                jObj = new JSONObject(retObj);
+                start = Integer.parseInt(jObj.getString("min_year"));
+                end = Integer.parseInt(jObj.getString("max_year"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            for(int i=end; i>= start; i--) {
+                years.add(Integer.toString(i));
+            }
+            runOnUiThread(new Runnable() {
+                              @Override
+                              public void run() {
+                                  adjustYearSpinner(years);
+                              }
+                          });
+
+            hideDialog();
         }
 
         //returns all the possible makes in a specified year

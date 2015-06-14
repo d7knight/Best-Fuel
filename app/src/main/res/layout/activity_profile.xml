@@ -15,13 +15,15 @@
         />
 
     <LinearLayout
+        android:id="@+id/profileLayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/bluebackgroundb"
         android:gravity="top"
         android:orientation="vertical"
         android:padding="10dp"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:visibility="visible">
 
         <FrameLayout
             android:layout_width="fill_parent"
@@ -61,7 +63,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="#FFFFFF"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:id="@+id/addFrame">
 
             <ImageView
                 android:id="@+id/plusCarImage"
@@ -84,68 +87,6 @@
 
         </FrameLayout>
 
-        <EditText
-            android:id="@+id/make"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="@color/white"
-            android:hint="@string/make"
-            android:inputType="text"
-            android:padding="10dp"
-            android:singleLine="true"
-            android:textColor="@color/input_login"
-            android:textColorHint="@color/input_login_hint" />
-
-        <EditText
-            android:id="@+id/model"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="@color/white"
-            android:hint="@string/model"
-            android:inputType="text"
-            android:padding="10dp"
-            android:singleLine="true"
-            android:textColor="@color/input_login"
-            android:textColorHint="@color/input_login_hint" />
-
-        <Spinner
-            android:id="@+id/year"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:layout_marginBottom="10dp"
-            android:spinnerMode="dropdown" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Regular"
-            android:id="@+id/regular"
-            android:background="@color/white"
-            android:layout_gravity="center_horizontal" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Premium"
-            android:id="@+id/premium"
-            android:background="@color/white"
-            android:layout_gravity="center_horizontal" />
-        </LinearLayout>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Vehicle"
-            android:gravity="right"
-            android:id="@+id/accept" />
     </LinearLayout>
+
 </RelativeLayout>
