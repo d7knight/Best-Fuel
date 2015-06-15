@@ -1,9 +1,11 @@
 package com.example.cs446project.bestfuel;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -197,7 +199,16 @@ public class ProfileActivity extends Activity {
                 @Override
                 public boolean onLongClick(View arg0) {
                     // Send single item click data to SingleItemView Class
-                    Toast.makeText(mContext, "Long click on car ", Toast.LENGTH_SHORT).show();
+                    final View customView = inflater.inflate(R.layout.manage_car_dialog, null);
+                    AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
+                            .setTitle("Car Settings")
+                            .setView(customView)
+                            .setPositiveButton("Finish", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                }
+                            }).create();
+                    dialog.show();
                     return true;
 
                 }
