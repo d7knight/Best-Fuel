@@ -80,7 +80,18 @@ public class ProfileActivity extends Activity {
 
         adapter.add(new Car("Lambo", "hello ",
                 "hello", "hello", "hello"));
+        adapter.add(new Car("Lambo", "hello ",
+                "hello", "hello", "hello"));
+        adapter.add(new Car("Lambo", "hello ",
+                "hello", "hello", "hello"));
+        adapter.add(new Car("Lambo", "hello ",
+                "hello", "hello", "hello"));
+        adapter.add(new Car("Lambo", "hello ",
+                "hello", "hello", "hello"));
+        adapter.add(new Car("Lambo", "hello ",
+                "hello", "hello", "hello"));
         adapter.notifyDataSetChanged();
+
 
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
