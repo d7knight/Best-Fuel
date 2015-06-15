@@ -8,22 +8,23 @@
             android:layout_width="match_parent"
             android:weightSum="3"
             android:background="#FFFFFF"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
 
             <ImageView
                 android:id="@+id/plusCarImage"
-                android:layout_width="128dp"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/defaultcar"
                 android:layout_gravity="start"
                 android:layout_marginLeft="22dp"
-                android:weight="1"
+                android:layout_weight="1"
                 android:layout_marginTop="2dp"/>
             <LinearLayout
                 android:layout_height="match_parent"
                 android:layout_width="0dp"
                 android:layout_marginRight="22dp"
-                android:layout_weight="3"
+                android:layout_weight="2"
                 android:weightSum="3"
                 android:orientation="vertical">
             <LinearLayout
@@ -34,48 +35,49 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-
+                    android:tag="Make"
                     android:layout_weight="1"
-                    android:padding="10dp"
+                    android:padding="1dp"
                     android:text="make"
-                    android:gravity="left"/>
+                    android:gravity="left"
+                     />
                 <TextView
 
-                    android:layout_width="fill_parent"
+                    android:layout_width="0dp"
                     android:layout_height="fill_parent"
-
+                    android:tag="Model"
                     android:layout_weight="1"
-                    android:padding="10dp"
+                    android:padding="1dp"
                     android:text="model"
                     android:gravity="left"/>
                 <TextView
 
-                    android:layout_width="fill_parent"
+                    android:layout_width="0dp"
                     android:layout_height="fill_parent"
-
+                    android:tag="Year"
                     android:layout_weight="1"
-                    android:padding="10dp"
+                    android:padding="1dp"
                     android:text="year"
                     android:gravity="left"/>
 
             </LinearLayout>
                 <TextView
-                    android:id="@+id/profileName4"
+                    android:tag="Capacity"
                     android:layout_width="fill_parent"
                     android:layout_height="0dp"
                     android:text="Capacity"
                     android:layout_weight="1"
-                    android:padding="10dp"
+                    android:padding="1dp"
                     android:gravity="left"/>
                 <TextView
-                    android:id="@+id/profileName3"
+                    android:tag="Stats"
                     android:layout_width="fill_parent"
                     android:layout_height="0dp"
                     android:text="Stats"
                     android:layout_weight="1"
-                    android:padding="10dp"
+                    android:padding="1dp"
                     android:gravity="left"/>
             </LinearLayout>
         </LinearLayout>

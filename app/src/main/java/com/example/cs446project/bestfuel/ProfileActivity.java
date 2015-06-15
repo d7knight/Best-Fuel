@@ -1,37 +1,35 @@
 package com.example.cs446project.bestfuel;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.DialogPreference;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.cs446project.bestfuel.helper.SQLiteHandler;
 import com.example.cs446project.bestfuel.helper.SessionManager;
-import com.example.cs446project.bestfuel.helper.StationAlgorithm;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class ProfileActivity extends Activity {
@@ -43,6 +41,9 @@ public class ProfileActivity extends Activity {
     private View inflated;
     private Spinner yearSpin;
     private ProgressDialog pDialog;
+    ListView list;
+    CarAdapter adapter;
+    ArrayList<Car> arraylist=new ArrayList<Car>();
 
     CQInterface cq;
     @Override
@@ -62,6 +63,22 @@ public class ProfileActivity extends Activity {
         if (!session.isLoggedIn()) {
             logoutUser();
         }
+
+        // Pass results to ListViewAdapter Class
+        adapter = new CarAdapter(this, arraylist);
+
+        // Binds the Adapter to the ListView
+        list = (ListView) findViewById(R.id.listview);
+        list.setAdapter(adapter);
+
+
+
+        //Kyle see this code below for how to add a car at any time
+
+
+        adapter.add(new Car("Lambo", "hello ",
+                "hello", "hello", "hello"));
+        adapter.notifyDataSetChanged();
 
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
@@ -109,6 +126,89 @@ public class ProfileActivity extends Activity {
         yearSpin = (Spinner) inflated.findViewById(R.id.year);
 
         //cq.getYears();
+    }
+
+
+
+   public class Car{
+       String make,model,year,capacity,stats;
+       public Car(String make, String model, String year, String capacity, String stats){
+           this.make=make;
+           this.model=model;
+           this.year=year;
+           this.capacity=capacity;
+           this.stats=stats;
+       }
+   }
+
+
+    public class CarAdapter extends ArrayAdapter<Car> {
+
+        // Declare Variables
+        Context mContext;
+        LayoutInflater inflater;
+        private List<Car> carlist = null;
+        private ArrayList<Car> arraylist;
+        public CarAdapter(Context context, ArrayList<Car> cars) {
+            super(context, 0, cars);
+            mContext = context;
+            this.carlist = cars;
+            inflater = LayoutInflater.from(mContext);
+            this.arraylist = new ArrayList<Car>();
+            this.arraylist.addAll(carlist);
+        }
+
+
+        public class ViewHolder {
+            View view;
+            TextView make,model,year,capacity,stats;
+
+        }
+
+
+        public View getView(final int position, View view, ViewGroup parent) {
+            final ViewHolder holder;
+            if (view == null) {
+                holder = new ViewHolder();
+
+                view = inflater.inflate(R.layout.car_template,parent, false);
+
+                holder.view=view;
+                holder.make= (TextView)view.findViewWithTag("Make");
+                holder.model= (TextView)view.findViewWithTag("Model");
+                holder.year= (TextView)view.findViewWithTag("Year");
+                holder.capacity= (TextView)view.findViewWithTag("Capacity");
+                holder.stats= (TextView)view.findViewWithTag("Stats");
+                view.setTag(holder);
+            } else {
+                holder = (ViewHolder) view.getTag();
+            }
+            Car c=carlist.get(position);
+            holder.make.setText(c.make);
+            holder.model.setText(c.model);
+            holder.year.setText(c.year);
+            holder.capacity.setText(c.capacity);
+            holder.stats.setText(c.stats);
+
+
+
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+
+                @Override
+                public boolean onLongClick(View arg0) {
+                    // Send single item click data to SingleItemView Class
+                    Toast.makeText(mContext, "Long click on car ", Toast.LENGTH_SHORT).show();
+                    return true;
+
+                }
+            });
+
+
+            return view;
+        }
+
+
+
     }
 
 
