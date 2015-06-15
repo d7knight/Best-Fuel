@@ -15,7 +15,9 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import com.example.cs446project.bestfuel.helper.SQLiteHandler;
 import com.example.cs446project.bestfuel.helper.SessionManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,7 +45,19 @@ public class ProfileActivity extends Activity {
     private ArrayList<String> carYears = new ArrayList<String>();
     private View inflated;
     private Spinner yearSpin;
+    private int setYear;
+    private Spinner makeSpin;
+    private String setMake;
+    private Spinner modelSpin;
+    private String setModel;
+    private Spinner trimSpin;
+    private String setTrim;
+    private String setTrimId;
+    private ArrayList<String> trimId = new ArrayList<String>();
+    private TextView carText;
+    private String fullCarString;
     private ProgressDialog pDialog;
+    private Dialog addDialog;
     ListView list;
     CarAdapter adapter;
     ArrayList<Car> arraylist=new ArrayList<Car>();
@@ -78,7 +93,7 @@ public class ProfileActivity extends Activity {
         //Kyle see this code below for how to add a car at any time
 
 
-        adapter.add(new Car("Lambo", "hello ",
+        /*adapter.add(new Car("Lambo", "hello ",
                 "hello", "hello", "hello"));
         adapter.add(new Car("Lambo", "hello ",
                 "hello", "hello", "hello"));
@@ -89,7 +104,7 @@ public class ProfileActivity extends Activity {
         adapter.add(new Car("Lambo", "hello ",
                 "hello", "hello", "hello"));
         adapter.add(new Car("Lambo", "hello ",
-                "hello", "hello", "hello"));
+                "hello", "hello", "hello"));*/
         adapter.notifyDataSetChanged();
 
 
@@ -123,10 +138,7 @@ public class ProfileActivity extends Activity {
         });
 
 
-
-
-
-        //testing carquery stuff
+        //Carquery Initialization stuff
         WebView webview = (WebView)findViewById(R.id.webview);
         webview.getSettings().setJavaScriptEnabled(true);
         cq = new CQInterface(this, webview);
@@ -137,8 +149,50 @@ public class ProfileActivity extends Activity {
 
         inflated = getLayoutInflater().inflate(R.layout.vehicle_layout, null);
         yearSpin = (Spinner) inflated.findViewById(R.id.year);
+        makeSpin = (Spinner) inflated.findViewById(R.id.make);
+        modelSpin = (Spinner) inflated.findViewById(R.id.model);
+        trimSpin = (Spinner) inflated.findViewById(R.id.trim);
+        carText = (TextView) inflated.findViewById(R.id.carData);
+        Button yesBtn = (Button) inflated.findViewById(R.id.carDialogYes);
+        Button noBtn = (Button) inflated.findViewById(R.id.carDialogNo);
 
-        //cq.getYears();
+        yesBtn.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //check if all fields are filled out
+                //if(trimSpin.getAdapter().getCount() >0) {}
+                if(carText.getText() != ""){
+                    //TODO actually make use of the tons of car data!
+                    //ideas include: show base data on profile. Click and opens up to lots of great stuff.
+                    //give option of either Liter per km or Mpg
+                    String cap = "";
+                    String stats ="";
+                    try {
+                        JSONArray jArray = new JSONArray(fullCarString);
+                        JSONObject jObj = jArray.getJSONObject(0);
+                        cap = jObj.getString("model_fuel_cap_g") +"G Capacity";
+                        stats = jObj.getString("model_mpg_hwy")+"mpg Highway   "+ jObj.getString("model_mpg_city")+"mpg City";
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, stats));
+                    adapter.notifyDataSetChanged();
+                    addDialog.dismiss();
+                }
+            }
+        });
+
+        noBtn.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                addDialog.dismiss();
+            }
+        });
+
+
+
     }
 
 
@@ -248,17 +302,33 @@ public class ProfileActivity extends Activity {
 
     public void addCarDialogue(View inflated){
 
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(inflated);
-        dialog.setTitle("Add A Vehicle");
+         addDialog = new Dialog(this);
+        addDialog.setContentView(inflated);
+        addDialog.setTitle("Add A Vehicle");
 
-        dialog.show();
+        addDialog.show();
     }
 
     private void adjustYearSpinner(ArrayList<String> years){
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_item, years);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         yearSpin.setAdapter(adapter);
+        yearSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                String curYear = yearSpin.getSelectedItem().toString();
+                if (curYear != "Years") {
+                    setYear = Integer.parseInt(curYear);
+                    cq.getMakes(setYear);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 
@@ -325,6 +395,7 @@ public class ProfileActivity extends Activity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            years.add("Years");
             for(int i=end; i>= start; i--) {
                 years.add(Integer.toString(i));
             }
@@ -341,6 +412,8 @@ public class ProfileActivity extends Activity {
         //returns all the possible makes in a specified year
         @JavascriptInterface
         public void getMakes(int year){
+            pDialog.setMessage("Fetching Vehicle Makes ...");
+            showDialog();
             webview.loadUrl("javascript:getMakes(" + year + ")");
         }
 
@@ -349,19 +422,115 @@ public class ProfileActivity extends Activity {
         @JavascriptInterface
         public void getMakesRet(String retObj) {
             Log.d("CQ", "the actual retobj for makes is " + retObj);
+            final ArrayList<String> makes = new ArrayList<String>();
+            int len=0;
+            JSONArray jArray=null;
+            try {
+                jArray = new JSONArray(retObj);
+                len= jArray.length();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            JSONObject jObj=null;
+            makes.add("Makes");
+            for(int i=0; i< len; i++) {
+                try {
+                    jObj= jArray.getJSONObject(i);
+                    makes.add(jObj.getString("make_display"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_item, makes);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    makeSpin.setAdapter(adapter);
+                    makeSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                            String curMake = makeSpin.getSelectedItem().toString();
+                            if (curMake != "Makes") {
+                                    setMake = curMake;
+                                    cq.getModels(curMake, setYear);
+                                Log.d("ProfileCQ", "calling from makes spinner");
+                                }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+                }
+            });
+
+            hideDialog();
         }
 
         //gets all the models from a specified make in a specified year
         //make example = "ford"
         @JavascriptInterface
         public void getModels(String make, int year) {
-            webview.loadUrl("javascript:getModels(" + make + "," + year + ")");
+            Log.d("CQ", "Grabbing models of "+make +" in " + year);
+            pDialog.setMessage("Fetching Vehicle Models ...");
+            showDialog();
+            webview.loadUrl("javascript:getModels(\"" + make + "\",\"" + year + "\")");
         }
 
         //RETURNS: JSON String [{"model_name":"Escape","model_make_id":"ford"}...]
         @JavascriptInterface
         public void getModelsRet(String retObj) {
             Log.d("CQ", "the actual retobj for models is " + retObj);
+            final ArrayList<String> models = new ArrayList<String>();
+            int len=0;
+            JSONArray jArray=null;
+            try {
+                jArray = new JSONArray(retObj);
+                len= jArray.length();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            JSONObject jObj=null;
+            models.add("Models");
+            for(int i=0; i< len; i++) {
+                try {
+                    jObj= jArray.getJSONObject(i);
+                    models.add(jObj.getString("model_name"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_item, models);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    modelSpin.setAdapter(adapter);
+                    modelSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                            String curModel = modelSpin.getSelectedItem().toString();
+                            Log.d("Profile", "current select model item is "+ curModel);
+                            if (curModel != "Models") {
+                                    setModel=curModel;
+                                    cq.getData(setMake, curModel, setYear, 0);
+                                }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+                }
+            });
+
+            hideDialog();
+
         }
 
         //gets all the details you need including vehicle id. Necessary step as there can be
@@ -369,25 +538,86 @@ public class ProfileActivity extends Activity {
         //PARAMETERS: fullDetails is 1 for all data or 0 for sparse data, test both to see what you need
         @JavascriptInterface
         public void getData(String make, String model, int year, int fullDetails) {
-            webview.loadUrl("javascript:getData(" + make + "," + year + "," + model + "," + fullDetails + ")");
+            pDialog.setMessage("Fetching Vehicle Data ...");
+            showDialog();
+            webview.loadUrl("javascript:getData(\"" + make + "\",\"" + year + "\",\"" + model + "\",\"" + fullDetails + "\")");
         }
 
         //returns a ton of data... print out to test it
         @JavascriptInterface
         public void getDataRet(String retObj) {
             Log.d("CQ", "the actual retobj for data is " + retObj);
+            final ArrayList<String> trim = new ArrayList<String>();
+            int len=0;
+            trimId.clear();
+            JSONArray jArray=null;
+            try {
+                jArray = new JSONArray(retObj);
+                len= jArray.length();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            JSONObject jObj=null;
+            trim.add("Vehicle");
+            for(int i=0; i< len; i++) {
+                try {
+                    jObj= jArray.getJSONObject(i);
+                    trim.add(jObj.getString("model_trim"));
+                    trimId.add(jObj.getString("model_id"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_item, trim);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    trimSpin.setAdapter(adapter);
+                    trimSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                            String curTrim = trimSpin.getSelectedItem().toString();
+                            if (curTrim != "Vehicle") {
+                                setTrim=curTrim;
+                                setTrimId=trimId.get(position-1);
+                                cq.getVehicle(Integer.parseInt(setTrimId));
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+                }
+            });
+
+            hideDialog();
         }
 
         //you need to grab vehicleId from getData and run it through here to get the exact car
         @JavascriptInterface
         public void getVehicle(int vehicleID) {
-            webview.loadUrl("javascript:getVehicle(" + vehicleID + ")");
+            Log.d("CQ", "getting vehicle with id " + vehicleID);
+            pDialog.setMessage("Fetching Vehicle ...");
+            showDialog();
+            webview.loadUrl("javascript:getVehicle(\"" + vehicleID + "\")");
         }
 
         //returns all available details about the car. print out to test
         @JavascriptInterface
         public void getVehicleRet(String retObj) {
             Log.d("CQ", "the actual retobj for vehicle is " + retObj);
+            fullCarString=retObj;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    carText.setText("Is " + setTrim + " your car?");
+                }
+            });
+            hideDialog();
         }
 
 
