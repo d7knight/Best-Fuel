@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+        <LinearLayout android:id="@+id/main_layout"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="128dp"
+            android:layout_width="match_parent"
+            android:weightSum="3"
+            android:background="#FFFFFF"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/plusCarImage"
+                android:layout_width="128dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/defaultcar"
+                android:layout_gravity="start"
+                android:layout_marginLeft="22dp"
+                android:weight="1"
+                android:layout_marginTop="2dp"/>
+            <LinearLayout
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_marginRight="22dp"
+                android:layout_weight="3"
+                android:weightSum="3"
+                android:orientation="vertical">
+            <LinearLayout
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:weightSum="3"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:text="make"
+                    android:gravity="left"/>
+                <TextView
+
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:text="model"
+                    android:gravity="left"/>
+                <TextView
+
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:text="year"
+                    android:gravity="left"/>
+
+            </LinearLayout>
+                <TextView
+                    android:id="@+id/profileName4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:text="Capacity"
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:gravity="left"/>
+                <TextView
+                    android:id="@+id/profileName3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dp"
+                    android:text="Stats"
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:gravity="left"/>
+            </LinearLayout>
+        </LinearLayout>
+
