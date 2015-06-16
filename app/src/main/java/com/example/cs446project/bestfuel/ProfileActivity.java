@@ -133,6 +133,7 @@ public class ProfileActivity extends Activity {
             public void onClick(View v) {
                 Log.d("CarFrame", "Clicked on add a car");
                 addCarDialogue(inflated);
+
                 cq.getYears();
             }
         });
@@ -145,6 +146,9 @@ public class ProfileActivity extends Activity {
         webview.addJavascriptInterface(cq, "Android");
 
         webview.loadUrl("file:///android_asset/carquery.html");
+
+
+        addDialog = new Dialog(this);
 
 
         inflated = getLayoutInflater().inflate(R.layout.vehicle_layout, null);
@@ -172,7 +176,7 @@ public class ProfileActivity extends Activity {
                         JSONArray jArray = new JSONArray(fullCarString);
                         JSONObject jObj = jArray.getJSONObject(0);
                         cap = jObj.getString("model_fuel_cap_g") +"G Capacity";
-                        stats = jObj.getString("model_mpg_hwy")+"mpg Highway   "+ jObj.getString("model_mpg_city")+"mpg City";
+                        stats = jObj.getString("model_mpg_hwy")+"mpg Highway "+ jObj.getString("model_mpg_city")+"mpg City";
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -302,9 +306,14 @@ public class ProfileActivity extends Activity {
 
     public void addCarDialogue(View inflated){
 
-         addDialog = new Dialog(this);
+         //addDialog = new Dialog(this);
         addDialog.setContentView(inflated);
         addDialog.setTitle("Add A Vehicle");
+        yearSpin.setAdapter(null);
+        makeSpin.setAdapter(null);
+        modelSpin.setAdapter(null);
+        trimSpin.setAdapter(null);
+        carText.setText("Enter Information To Search for your car");
 
         addDialog.show();
     }
