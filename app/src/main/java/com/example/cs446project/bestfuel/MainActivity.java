@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
 	private void logoutUser() {
 		session.setLogin(false);
 
-		db.deleteUsers();
+		db.deleteUsers(); //TODO rework
 
 		// Launching the login activity
 		Intent intent = new Intent(MainActivity.this, LoginActivity.class);

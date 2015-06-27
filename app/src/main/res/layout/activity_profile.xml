@@ -18,7 +18,6 @@
         android:id="@+id/profileLayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@drawable/bluebackgroundb"
         android:gravity="top"
         android:orientation="vertical"
         android:padding="10dp"

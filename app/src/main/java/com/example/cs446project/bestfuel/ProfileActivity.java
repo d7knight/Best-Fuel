@@ -88,23 +88,6 @@ public class ProfileActivity extends Activity {
         list = (ListView) findViewById(R.id.listview);
         list.setAdapter(adapter);
 
-
-
-        //Kyle see this code below for how to add a car at any time
-
-
-        /*adapter.add(new Car("Lambo", "hello ",
-                "hello", "hello", "hello"));
-        adapter.add(new Car("Lambo", "hello ",
-                "hello", "hello", "hello"));
-        adapter.add(new Car("Lambo", "hello ",
-                "hello", "hello", "hello"));
-        adapter.add(new Car("Lambo", "hello ",
-                "hello", "hello", "hello"));
-        adapter.add(new Car("Lambo", "hello ",
-                "hello", "hello", "hello"));
-        adapter.add(new Car("Lambo", "hello ",
-                "hello", "hello", "hello"));*/
         adapter.notifyDataSetChanged();
 
 
@@ -171,16 +154,18 @@ public class ProfileActivity extends Activity {
                     //ideas include: show base data on profile. Click and opens up to lots of great stuff.
                     //give option of either Liter per km or Mpg
                     String cap = "";
-                    String stats ="";
+                    String hwy ="";
+                    String city ="";
                     try {
                         JSONArray jArray = new JSONArray(fullCarString);
                         JSONObject jObj = jArray.getJSONObject(0);
-                        cap = jObj.getString("model_fuel_cap_g") +"G Capacity";
-                        stats = jObj.getString("model_mpg_hwy")+"mpg Highway "+ jObj.getString("model_mpg_city")+"mpg City";
+                        cap = jObj.getString("model_fuel_cap_l") +"L Tank";
+                        hwy = jObj.getString("model_lkm_hwy")+" L/Km Highway";
+                        city = jObj.getString("model_lkm_city")+" L/Km City";
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, stats));
+                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city));
                     adapter.notifyDataSetChanged();
                     addDialog.dismiss();
                 }
@@ -202,13 +187,14 @@ public class ProfileActivity extends Activity {
 
 
    public class Car{
-       String make,model,year,capacity,stats;
-       public Car(String make, String model, String year, String capacity, String stats){
+       String make,model,year,capacity,hwy,city;
+       public Car(String make, String model, String year, String capacity, String hwy, String city){
            this.make=make;
            this.model=model;
            this.year=year;
            this.capacity=capacity;
-           this.stats=stats;
+           this.hwy=hwy;
+           this.city=city;
        }
    }
 
@@ -232,7 +218,7 @@ public class ProfileActivity extends Activity {
 
         public class ViewHolder {
             View view;
-            TextView make,model,year,capacity,stats;
+            TextView make,model,year,capacity,hwy,city;
 
         }
 
@@ -249,7 +235,8 @@ public class ProfileActivity extends Activity {
                 holder.model= (TextView)view.findViewWithTag("Model");
                 holder.year= (TextView)view.findViewWithTag("Year");
                 holder.capacity= (TextView)view.findViewWithTag("Capacity");
-                holder.stats= (TextView)view.findViewWithTag("Stats");
+                holder.hwy= (TextView)view.findViewWithTag("Hwy");
+                holder.city= (TextView)view.findViewWithTag("City");
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
@@ -259,7 +246,8 @@ public class ProfileActivity extends Activity {
             holder.model.setText(c.model);
             holder.year.setText(c.year);
             holder.capacity.setText(c.capacity);
-            holder.stats.setText(c.stats);
+            holder.hwy.setText(c.hwy);
+            holder.city.setText(c.city);
 
 
 
@@ -402,6 +390,7 @@ public class ProfileActivity extends Activity {
                 start = Integer.parseInt(jObj.getString("min_year"));
                 end = Integer.parseInt(jObj.getString("max_year"));
             } catch (JSONException e) {
+                Log.d("CQ", "getYearsRet parse error");
                 e.printStackTrace();
             }
             years.add("Years");

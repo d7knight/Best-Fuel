@@ -51,6 +51,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		Log.d(TAG, "Database tables created");
 	}
 
+
 	// Upgrading database
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -59,6 +60,11 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
 		// Create tables again
 		onCreate(db);
+	}
+
+	//creates table for car data
+	public void createCarDB() {
+
 	}
 
 	/**
@@ -132,6 +138,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
 		Log.d(TAG, "Deleted all user info from sqlite");
 	}
+
 
 
 
