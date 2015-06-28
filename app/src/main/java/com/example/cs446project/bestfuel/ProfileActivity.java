@@ -98,7 +98,7 @@ public class ProfileActivity extends Activity {
         HashMap<String, String> user = db.getUserDetails();
 
         //Profile Data ========================================
-        String name = user.get("name");
+        final String name = user.get("name");
         String email = user.get("email");
 
         TextView nameTxt = (TextView) findViewById(R.id.profileName);
@@ -143,6 +143,9 @@ public class ProfileActivity extends Activity {
         Button yesBtn = (Button) inflated.findViewById(R.id.carDialogYes);
         Button noBtn = (Button) inflated.findViewById(R.id.carDialogNo);
 
+
+        populateCars(user.get("name"), db);
+
         yesBtn.setOnClickListener(new Button.OnClickListener() {
 
             @Override
@@ -159,6 +162,7 @@ public class ProfileActivity extends Activity {
                     try {
                         JSONArray jArray = new JSONArray(fullCarString);
                         JSONObject jObj = jArray.getJSONObject(0);
+                        addCarToDB(fullCarString, name);
                         cap = jObj.getString("model_fuel_cap_l") +"L Tank";
                         hwy = jObj.getString("model_lkm_hwy")+" L/Km Highway";
                         city = jObj.getString("model_lkm_city")+" L/Km City";
@@ -181,9 +185,39 @@ public class ProfileActivity extends Activity {
         });
 
 
-
     }
 
+    public void populateCars(String name, SQLiteHandler db) {
+        ArrayList<HashMap<String, String>> retList = db.getCars(name);
+        for (int i=0; i<retList.size(); i++) {
+            adapter.add(new Car(retList.get(i).get("make"), retList.get(i).get("model"), retList.get(i).get("year"), "" +retList.get(i).get("fuel_capacity_l")+" L Tank" , ""+retList.get(i).get("hwy_lkm")+" L/Km City", ""+retList.get(i).get("city_lkm")+" L/Km Highway"));
+        }
+    }
+
+    public void addCarToDB(String carString, String name) {
+        try{
+            JSONArray jArr = new JSONArray(carString);
+            JSONObject jObj = jArr.getJSONObject(0);
+            boolean isdefault=true;
+            if(arraylist.size()>0) {
+                isdefault =false;
+            }
+            db.addCar(name, isdefault, Integer.toString(setYear), setMake,setModel,jObj.getString("model_id"),jObj.getString("model_body"),
+                    jObj.getString("model_engine_position"), jObj.getString("model_engine_cc"),jObj.getString("model_engine_cyl"),
+                    jObj.getString("model_engine_type"), jObj.getString("model_engine_valves_per_cyl"), jObj.getString("model_engine_power_rpm"), jObj.getString("model_engine_fuel"),
+                   jObj.getString("model_top_speed_kph"),jObj.getString("model_0_to_100_kph"),jObj.getString("model_drive"), jObj.getString("model_transmission_type"),
+                   jObj.getString("model_seats"), jObj.getString("model_doors"), jObj.getString("model_weight_kg"), jObj.getString("model_length_mm"),
+                   jObj.getString("model_height_mm"),jObj.getString("model_width_mm"), jObj.getString("model_wheelbase_mm"), jObj.getString("model_lkm_hwy"),
+                   jObj.getString("model_lkm_mixed"), jObj.getString("model_lkm_city"), jObj.getString("model_fuel_cap_l"), jObj.getString("model_sold_in_us"),
+                   jObj.getString("model_engine_power_hp"), jObj.getString("model_top_speed_mph"), jObj.getString("model_weight_lbs"), jObj.getString("model_length_in"),
+                   jObj.getString("model_width_in"), jObj.getString("model_height_in"), jObj.getString("model_mpg_hwy"), jObj.getString("model_mpg_city"),
+                    jObj.getString("model_mpg_mixed"), jObj.getString("model_fuel_cap_g"), jObj.getString("make_country"));
+
+            Log.d("ADDCARTODB", "returned");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
 
    public class Car{
@@ -195,6 +229,7 @@ public class ProfileActivity extends Activity {
            this.capacity=capacity;
            this.hwy=hwy;
            this.city=city;
+
        }
    }
 
