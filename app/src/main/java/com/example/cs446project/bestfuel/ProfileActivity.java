@@ -42,6 +42,7 @@ public class ProfileActivity extends Activity {
     private TextView txtInfo;
     private SQLiteHandler db;
     private SessionManager session;
+    private String userName;
     private ArrayList<String> carYears = new ArrayList<String>();
     private View inflated;
     private Spinner yearSpin;
@@ -99,6 +100,7 @@ public class ProfileActivity extends Activity {
 
         //Profile Data ========================================
         final String name = user.get("name");
+        userName=name;
         String email = user.get("email");
 
         TextView nameTxt = (TextView) findViewById(R.id.profileName);
@@ -159,6 +161,7 @@ public class ProfileActivity extends Activity {
                     String cap = "";
                     String hwy ="";
                     String city ="";
+                    String id="";
                     try {
                         JSONArray jArray = new JSONArray(fullCarString);
                         JSONObject jObj = jArray.getJSONObject(0);
@@ -166,10 +169,11 @@ public class ProfileActivity extends Activity {
                         cap = jObj.getString("model_fuel_cap_l") +"L Tank";
                         hwy = jObj.getString("model_lkm_hwy")+" L/Km Highway";
                         city = jObj.getString("model_lkm_city")+" L/Km City";
+                        id= jObj.getString("model_id");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city));
+                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city, id));
                     adapter.notifyDataSetChanged();
                     addDialog.dismiss();
                 }
@@ -190,7 +194,7 @@ public class ProfileActivity extends Activity {
     public void populateCars(String name, SQLiteHandler db) {
         ArrayList<HashMap<String, String>> retList = db.getCars(name);
         for (int i=0; i<retList.size(); i++) {
-            adapter.add(new Car(retList.get(i).get("make"), retList.get(i).get("model"), retList.get(i).get("year"), "" +retList.get(i).get("fuel_capacity_l")+" L Tank" , ""+retList.get(i).get("hwy_lkm")+" L/Km City", ""+retList.get(i).get("city_lkm")+" L/Km Highway"));
+            adapter.add(new Car(retList.get(i).get("make"), retList.get(i).get("model"), retList.get(i).get("year"), "" +retList.get(i).get("fuel_capacity_l")+" L Tank" , ""+retList.get(i).get("hwy_lkm")+" L/Km City", ""+retList.get(i).get("city_lkm")+" L/Km Highway", retList.get(i).get("id")));
         }
     }
 
@@ -200,6 +204,7 @@ public class ProfileActivity extends Activity {
             JSONObject jObj = jArr.getJSONObject(0);
             boolean isdefault=true;
             if(arraylist.size()>0) {
+                Log.d("Profile", "car is not default");
                 isdefault =false;
             }
             db.addCar(name, isdefault, Integer.toString(setYear), setMake,setModel,jObj.getString("model_id"),jObj.getString("model_body"),
@@ -221,14 +226,15 @@ public class ProfileActivity extends Activity {
 
 
    public class Car{
-       String make,model,year,capacity,hwy,city;
-       public Car(String make, String model, String year, String capacity, String hwy, String city){
+       String make,model,year,capacity,hwy,city,id;
+       public Car(String make, String model, String year, String capacity, String hwy, String city, String id){
            this.make=make;
            this.model=model;
            this.year=year;
            this.capacity=capacity;
            this.hwy=hwy;
            this.city=city;
+           this.id=id;
 
        }
    }
@@ -276,14 +282,14 @@ public class ProfileActivity extends Activity {
             } else {
                 holder = (ViewHolder) view.getTag();
             }
-            Car c=carlist.get(position);
+            final Car c=carlist.get(position);
             holder.make.setText(c.make);
             holder.model.setText(c.model);
             holder.year.setText(c.year);
             holder.capacity.setText(c.capacity);
             holder.hwy.setText(c.hwy);
             holder.city.setText(c.city);
-
+            final String name = userName;
 
 
             view.setOnLongClickListener(new View.OnLongClickListener() {
@@ -292,15 +298,25 @@ public class ProfileActivity extends Activity {
                 public boolean onLongClick(View arg0) {
                     // Send single item click data to SingleItemView Class
                     final View customView = inflater.inflate(R.layout.manage_car_dialog, null);
-                    AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
+                    final AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
                             .setTitle("Car Settings")
                             .setView(customView)
                             .setPositiveButton("Finish", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-
                                 }
                             }).create();
                     dialog.show();
+                    Button delBut = (Button)customView.findViewWithTag("Delete");
+                    delBut.setOnClickListener(new Button.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d("CarManage", "Delete Button was pressed on car "+c.make);
+                            carlist.remove(position);
+                            adapter.notifyDataSetChanged();
+                            db.deleteCar(Integer.parseInt(c.id), name);
+                            dialog.dismiss();
+                        }
+                    });
                     return true;
 
                 }

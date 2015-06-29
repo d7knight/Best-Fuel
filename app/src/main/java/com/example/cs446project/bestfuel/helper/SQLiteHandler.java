@@ -244,7 +244,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
 	public void deleteCar(int id, String name) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		String query = "DELETE * FROM car_table WHERE id =" + id + " AND name =" + name;
+		String query = "DELETE FROM car_table WHERE id ='" + id + "' AND name ='" + name+"'";
 		db.execSQL(query);
 	}
 
@@ -267,6 +267,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 				car.put("year", cursor.getString(2));
 				car.put("make", cursor.getString(3));
 				car.put("model", cursor.getString(4));
+				car.put("id", cursor.getString(5));
 				car.put("hwy_lkm", cursor.getString(25));
 				car.put("mixed_lkm", cursor.getString(26));
 				car.put("city_lkm", cursor.getString(27));
@@ -287,5 +288,30 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		return carList;
 	}
 
+	public HashMap<String, String> getCar(Boolean isdefault, String name) {
+		String selectQuery = "SELECT  * FROM  car_table WHERE name='"+name+"' AND isdefault='"+isdefault+"'";
+		HashMap<String, String> car = new HashMap<String, String>();
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		cursor.moveToFirst();
+		//Log.d(TAG, "Cursor is testing: " + cursor.getString(0));
+		Log.d("GETCAR", "starting to retrieve car");
+		if (cursor.getCount() > 0) {
+			car.put("name", cursor.getString(0));
+			car.put("isdefault", cursor.getString(1));
+			car.put("year", cursor.getString(2));
+			car.put("make", cursor.getString(3));
+			car.put("model", cursor.getString(4));
+			car.put("id", cursor.getString(5));
+			car.put("hwy_lkm", cursor.getString(25));
+			car.put("mixed_lkm", cursor.getString(26));
+			car.put("city_lkm", cursor.getString(27));
+			car.put("fuel_capacity_l", cursor.getString(28));
+		}
+		cursor.close();
+		db.close();
+		return car;
+	}
 
 }

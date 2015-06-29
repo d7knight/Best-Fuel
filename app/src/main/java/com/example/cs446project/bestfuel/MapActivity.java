@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.cs446project.bestfuel.app.AppConfig;
 
 import com.example.cs446project.bestfuel.helper.MyLocation;
+import com.example.cs446project.bestfuel.helper.SQLiteHandler;
 import com.example.cs446project.bestfuel.helper.StationAlgorithm;
 
 import java.security.Provider;
@@ -76,11 +77,12 @@ public class MapActivity extends Activity {
 
         Log.d("Main", "Main activity loaded");
 
+        SQLiteHandler db = new SQLiteHandler(getApplicationContext());
 
 
         if(saCreated==false) {
             MapActivity curAct = this;
-            sa = new StationAlgorithm(curAct);
+            sa = new StationAlgorithm(curAct, db);
             saCreated = true;
         }
         webview.clearCache(true);

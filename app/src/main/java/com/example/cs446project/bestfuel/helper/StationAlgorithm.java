@@ -3,6 +3,7 @@ package com.example.cs446project.bestfuel.helper;
 import android.app.Application;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -38,16 +39,20 @@ public class StationAlgorithm{
     private double curLat;
     private double curLon;
     private String curGrade;
+    private int carCapacity;
+    private float carEconomoy;
+    private SQLiteHandler db;
     MapActivity curAct;
 
     //constructor
-    public StationAlgorithm(MapActivity curAct) {
+    public StationAlgorithm(MapActivity curAct, SQLiteHandler db) {
         // Progress dialog
         //testing this out
         //getPrices(51.5033630,-0.1276250, 10, "Regular"); //near me
         //getData(40.3532924, -79.8307726, 10, "Regular"); //For testing
         //findBestStation(40.3532924, -79.8307726);
 
+        this.db = db;
 
         this.curAct=curAct;
     }
@@ -63,8 +68,20 @@ public class StationAlgorithm{
         rad = 5;
         curLat = lat;
         curLon=lon;
-        curGrade="Regular";//temporary
-
+        curGrade="Regular";//TODO use car settings for this
+        HashMap<String,String> user = db.getUserDetails();
+        HashMap<String, String> curCar = db.getCar(true, user.get("name"));
+        Log.d("SA", "name is "+ curCar.get("make"));
+        Log.d("SA", "precapacity is "+curCar.get("fuel_capacity_l"));
+        if(curCar != null && !curCar.isEmpty()) {
+            this.carCapacity = Integer.parseInt(curCar.get("fuel_capacity_l"));
+            this.carEconomoy = Float.parseFloat(curCar.get("mixed_lkm"));
+        } else {
+            this.carCapacity = 50;
+            this.carEconomoy = 17;
+        }
+        Log.d("SA", "capacity is "+this.carCapacity);
+        Log.d("SA", "economy is "+this.carEconomoy);
 
         getData(lat, lon, rad, "Regular");
     }
@@ -147,7 +164,7 @@ public class StationAlgorithm{
             double score=-1;
             bestStationIndex=-1;
             for(int i=0; i<size; i++) {
-                double curVal =calculate(stationList.get(i).distance, stationList.get(i).price, 20, false);
+                double curVal =calculate(stationList.get(i).distance, stationList.get(i).price, this.carEconomoy, this.carCapacity);
                 if(score==-1 || curVal<score){
                     score=curVal;
                     bestStationIndex=i;
@@ -159,23 +176,22 @@ public class StationAlgorithm{
     }
 
 
-    private double calculate(double distance, double price, int economy, boolean returning) {
+    private double calculate(double distance, double price, float economy, int capacity) {
         //currently not great for routes. Mostly for Get Gas Now. Needs to calculate
         //total route fuel usage to be useful for other option
 
         //easy part calculating fuel used getting to station (and back potentially)
         double lUsed = (economy / 100) * distance; //economy is given in L/100km
-        if (returning == true) lUsed = lUsed * 2;
-
         //Canada = price/L
-        double fuelPUsed = price * lUsed; //costs this much to get their and back using that stations price
-        //for now just return this. It is a crappy identifier of best station but works.
-        //TODO make better
+        double fuelPUsed = price * lUsed;
+        double fuelEconomy = fuelPUsed*economy; //basic features of trip there. Economy doesnt do a whole lot yet for the calculation
 
+        double fillUp = price*(capacity*0.7);//price of filling up the car using a default tank of 30% full (make this an option later) TODO
 
-        return fuelPUsed;
+        double total = fuelEconomy + fillUp;
+
+        return total;
     }
-
 
 
 }
