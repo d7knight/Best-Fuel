@@ -289,14 +289,13 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 	}
 
 	public HashMap<String, String> getCar(Boolean isdefault, String name) {
-		String selectQuery = "SELECT  * FROM  car_table WHERE name='"+name+"' AND isdefault='"+isdefault+"'";
+		String selectQuery = "SELECT * FROM car_table WHERE name='"+name+"' AND isdefault='1'";
 		HashMap<String, String> car = new HashMap<String, String>();
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		cursor.moveToFirst();
-		//Log.d(TAG, "Cursor is testing: " + cursor.getString(0));
-		Log.d("GETCAR", "starting to retrieve car");
+		Log.d(TAG, "Grabbing Default car with user "+name+" and default "+isdefault);
 		if (cursor.getCount() > 0) {
 			car.put("name", cursor.getString(0));
 			car.put("isdefault", cursor.getString(1));

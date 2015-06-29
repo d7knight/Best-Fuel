@@ -101,7 +101,7 @@ public class StationAlgorithm{
                     JSONArray jsa = js.getJSONArray("result");
                     stationList.clear();
                     for (int i=0;i<jsa.length();i++) {
-                        JSONObject jsPart = jsa.getJSONObject(0);
+                        JSONObject jsPart = jsa.getJSONObject(i);
 
                         //splitting values
                         int id = Integer.parseInt(jsPart.getString("id"));
@@ -164,6 +164,7 @@ public class StationAlgorithm{
             double score=-1;
             bestStationIndex=-1;
             for(int i=0; i<size; i++) {
+                Log.d("ALG", "testing "+i+" which is "+stationList.get(i).address);
                 double curVal =calculate(stationList.get(i).distance, stationList.get(i).price, this.carEconomoy, this.carCapacity);
                 if(score==-1 || curVal<score){
                     score=curVal;
@@ -190,6 +191,7 @@ public class StationAlgorithm{
 
         double total = fuelEconomy + fillUp;
 
+        Log.d("ALG", "Distance of "+distance+" resulted in "+ total);
         return total;
     }
 
