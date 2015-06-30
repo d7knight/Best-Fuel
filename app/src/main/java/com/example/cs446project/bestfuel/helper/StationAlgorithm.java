@@ -70,7 +70,7 @@ public class StationAlgorithm{
         curLon=lon;
         curGrade="Regular";//TODO use car settings for this
         HashMap<String,String> user = db.getUserDetails();
-        HashMap<String, String> curCar = db.getCar(true, user.get("name"));
+        HashMap<String, String> curCar = db.getCar(true, user.get("name"), 0);
         Log.d("SA", "name is "+ curCar.get("make"));
         Log.d("SA", "precapacity is "+curCar.get("fuel_capacity_l"));
         if(curCar != null && !curCar.isEmpty()) {

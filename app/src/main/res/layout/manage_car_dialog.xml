@@ -1,26 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Default Car"
-        android:id="@+id/checkBox"
-        android:checked="false" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Delete Car"
-        android:id="@+id/button"
-        android:tag="Delete"/>
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginTop="10dp">
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Edit Car"
-        android:id="@+id/button2" />
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:checked="true"
+            android:background="#0099CC"
+            android:textColor="#FFFFFF"
+            android:tag="Default"
+            android:text="Default Car"/>
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#B20000"
+            android:textColor="#FFFFFF"
+            android:tag="Delete"
+            android:text="Delete Car" />
+    </LinearLayout>
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="156dp"
+        android:fillViewport="true"
+        android:scrollbars="vertical"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="8dp">
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:tag="DataText"/>
+
+
+    </ScrollView>
 </LinearLayout>

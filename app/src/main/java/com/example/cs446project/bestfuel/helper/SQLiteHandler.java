@@ -268,10 +268,41 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 				car.put("make", cursor.getString(3));
 				car.put("model", cursor.getString(4));
 				car.put("id", cursor.getString(5));
+				car.put("body", cursor.getString(6));
+				car.put("engine_position", cursor.getString(7));
+				car.put("engine_cc", cursor.getString(8));
+				car.put("engine_cyl", cursor.getString(9));
+				car.put("engine_type", cursor.getString(10));
+				car.put("engine_valves_per_cyl", cursor.getString(11));
+				car.put("engine_power_rpm", cursor.getString(12));
+				car.put("engine_fuel", cursor.getString(13));
+				car.put("top_speed_kmh", cursor.getString(14));
+				car.put("kph0to100", cursor.getString(15));
+				car.put("drive", cursor.getString(16));
+				car.put("transmission", cursor.getString(17));
+				car.put("seats", cursor.getString(18));
+				car.put("doors", cursor.getString(19));
+				car.put("weight_kg", cursor.getString(20));
+				car.put("length_mm", cursor.getString(21));
+				car.put("height_mm", cursor.getString(22));
+				car.put("width_mm", cursor.getString(23));
+				car.put("wheelbase_mm", cursor.getString(24));
 				car.put("hwy_lkm", cursor.getString(25));
 				car.put("mixed_lkm", cursor.getString(26));
 				car.put("city_lkm", cursor.getString(27));
 				car.put("fuel_capacity_l", cursor.getString(28));
+				car.put("sold_in_us", cursor.getString(29));
+				car.put("engine_hp", cursor.getString(30));
+				car.put("top_speed_mph", cursor.getString(31));
+				car.put("weight_ibs", cursor.getString(32));
+				car.put("length_in", cursor.getString(33));
+				car.put("width_in", cursor.getString(34));
+				car.put("height_in", cursor.getString(35));
+				car.put("hwy_mpg", cursor.getString(36));
+				car.put("city_mpg", cursor.getString(37));
+				car.put("mixed_mpg", cursor.getString(38));
+				car.put("fuel_capacity_g", cursor.getString(39));
+				car.put("country", cursor.getString(40));
 				Log.d("CURSOR TEST", "cursor is " + car.get("name"));
 				Log.d("CURSOR TEST", "cursor is " + car.get("isdefault"));
 				Log.d("CURSOR TEST", "cursor is " + car.get("year"));
@@ -288,8 +319,13 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		return carList;
 	}
 
-	public HashMap<String, String> getCar(Boolean isdefault, String name) {
-		String selectQuery = "SELECT * FROM car_table WHERE name='"+name+"' AND isdefault='1'";
+	public HashMap<String, String> getCar(Boolean isdefault, String name, int id) {
+		String selectQuery ;
+		if(isdefault==true) {
+			selectQuery="SELECT * FROM car_table WHERE name='"+name+"' AND isdefault='1'";
+		} else {
+			selectQuery="SELECT * FROM car_table WHERE name='"+name+"' AND id='"+id+"'";
+		}
 		HashMap<String, String> car = new HashMap<String, String>();
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -303,10 +339,41 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 			car.put("make", cursor.getString(3));
 			car.put("model", cursor.getString(4));
 			car.put("id", cursor.getString(5));
+			car.put("body", cursor.getString(6));
+			car.put("engine_position", cursor.getString(7));
+			car.put("engine_cc", cursor.getString(8));
+			car.put("engine_cyl", cursor.getString(9));
+			car.put("engine_type", cursor.getString(10));
+			car.put("engine_valves_per_cyl", cursor.getString(11));
+			car.put("engine_power_rpm", cursor.getString(12));
+			car.put("engine_fuel", cursor.getString(13));
+			car.put("top_speed_kmh", cursor.getString(14));
+			car.put("kph0to100", cursor.getString(15));
+			car.put("drive", cursor.getString(16));
+			car.put("transmission", cursor.getString(17));
+			car.put("seats", cursor.getString(18));
+			car.put("doors", cursor.getString(19));
+			car.put("weight_kg", cursor.getString(20));
+			car.put("length_mm", cursor.getString(21));
+			car.put("height_mm", cursor.getString(22));
+			car.put("width_mm", cursor.getString(23));
+			car.put("wheelbase_mm", cursor.getString(24));
 			car.put("hwy_lkm", cursor.getString(25));
 			car.put("mixed_lkm", cursor.getString(26));
 			car.put("city_lkm", cursor.getString(27));
 			car.put("fuel_capacity_l", cursor.getString(28));
+			car.put("sold_in_us", cursor.getString(29));
+			car.put("engine_hp", cursor.getString(30));
+			car.put("top_speed_mph", cursor.getString(31));
+			car.put("weight_ibs", cursor.getString(32));
+			car.put("length_in", cursor.getString(33));
+			car.put("width_in", cursor.getString(34));
+			car.put("height_in", cursor.getString(35));
+			car.put("hwy_mpg", cursor.getString(36));
+			car.put("city_mpg", cursor.getString(37));
+			car.put("mixed_mpg", cursor.getString(38));
+			car.put("fuel_capacity_g", cursor.getString(39));
+			car.put("country", cursor.getString(40));
 		}
 		cursor.close();
 		db.close();

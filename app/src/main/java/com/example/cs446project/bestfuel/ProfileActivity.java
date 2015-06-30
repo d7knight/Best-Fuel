@@ -18,6 +18,7 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -173,7 +174,9 @@ public class ProfileActivity extends Activity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city, id));
+                    HashMap<String, String> recentCar = db.getCar(false, name, Integer.parseInt(id));
+
+                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city, id, recentCar));
                     adapter.notifyDataSetChanged();
                     addDialog.dismiss();
                 }
@@ -194,7 +197,9 @@ public class ProfileActivity extends Activity {
     public void populateCars(String name, SQLiteHandler db) {
         ArrayList<HashMap<String, String>> retList = db.getCars(name);
         for (int i=0; i<retList.size(); i++) {
-            adapter.add(new Car(retList.get(i).get("make"), retList.get(i).get("model"), retList.get(i).get("year"), "" +retList.get(i).get("fuel_capacity_l")+" L Tank" , ""+retList.get(i).get("hwy_lkm")+" L/Km City", ""+retList.get(i).get("city_lkm")+" L/Km Highway", retList.get(i).get("id")));
+            adapter.add(new Car(retList.get(i).get("make"), retList.get(i).get("model"), retList.get(i).get("year"), "" +retList.get(i).get("fuel_capacity_l")+" L Tank" ,
+                    ""+retList.get(i).get("hwy_lkm")+" L/Km City", ""+retList.get(i).get("city_lkm")+" L/Km Highway", retList.get(i).get("id"),
+                    retList.get(i)));
         }
     }
 
@@ -227,7 +232,8 @@ public class ProfileActivity extends Activity {
 
    public class Car{
        String make,model,year,capacity,hwy,city,id;
-       public Car(String make, String model, String year, String capacity, String hwy, String city, String id){
+       HashMap<String, String> details;
+       public Car(String make, String model, String year, String capacity, String hwy, String city, String id, HashMap<String, String> allDetails){
            this.make=make;
            this.model=model;
            this.year=year;
@@ -235,7 +241,8 @@ public class ProfileActivity extends Activity {
            this.hwy=hwy;
            this.city=city;
            this.id=id;
-
+           this.details = allDetails;
+           Log.d("CARADD", "country is "+this.details.get("countr"));
        }
    }
 
@@ -290,6 +297,15 @@ public class ProfileActivity extends Activity {
             holder.hwy.setText(c.hwy);
             holder.city.setText(c.city);
             final String name = userName;
+            final String setName = c.make +" "+c.model+ " Settings";
+            Boolean isDefault;
+            if(position==0){
+                isDefault=true;
+            } else {
+                isDefault=false;
+            }
+            final Boolean curDefault = isDefault;
+
 
 
             view.setOnLongClickListener(new View.OnLongClickListener() {
@@ -299,24 +315,141 @@ public class ProfileActivity extends Activity {
                     // Send single item click data to SingleItemView Class
                     final View customView = inflater.inflate(R.layout.manage_car_dialog, null);
                     final AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
-                            .setTitle("Car Settings")
+                            .setTitle(setName)
                             .setView(customView)
                             .setPositiveButton("Finish", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                 }
-                            }).create();
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                }
+                            })
+                            .create();
+
                     dialog.show();
-                    Button delBut = (Button)customView.findViewWithTag("Delete");
+                    Button delBut = (Button) customView.findViewWithTag("Delete");
                     delBut.setOnClickListener(new Button.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Log.d("CarManage", "Delete Button was pressed on car "+c.make);
+                            Log.d("CarManage", "Delete Button was pressed on car " + c.make);
                             carlist.remove(position);
                             adapter.notifyDataSetChanged();
                             db.deleteCar(Integer.parseInt(c.id), name);
                             dialog.dismiss();
                         }
                     });
+                    CheckBox defCheck = (CheckBox) customView.findViewWithTag("Default");
+                    defCheck.setChecked(curDefault);
+                    TextView dataText = (TextView) customView.findViewWithTag("DataText");
+                    dataText.setText("");
+                    dataText.append("Year: " + c.year);
+                    dataText.append("\nMake: " + c.make);
+                    dataText.append("\nModel: " + c.model);
+                    if(!c.details.get("body").equals("null")){
+                        dataText.append("\nBody Type: " + c.details.get("body"));
+                    }
+                    Log.d("CARLIST", "eng_pos |"+c.details.get("engine_position").equals("null")+"|");
+                    if(!c.details.get("engine_position").equals("null")){
+                        dataText.append("\nEngine Position: " + c.details.get("engine_position"));
+                    }
+                    if(!c.details.get("engine_cc").equals("null")){
+                        dataText.append("\nEngine CC: " + c.details.get("engine_cc"));
+                    }
+                    if(!c.details.get("engine_type").equals("null")){
+                        dataText.append("\nEngine Type: " + c.details.get("engine_type"));
+                    }
+                    if(!c.details.get("engine_cyl").equals("null")){
+                        dataText.append("\nEngine Cyl: " + c.details.get("engine_cyl"));
+                    }
+                    if(!c.details.get("engine_valves_per_cyl").equals("null")){
+                        dataText.append("\nEngine Valves/Cyl: " + c.details.get("engine_valves_per_cyl"));
+                    }
+                    if(!c.details.get("engine_power_rpm").equals("null")){
+                        dataText.append("\nEngine Power: " + c.details.get("engine_power_rpm")+" RPM");
+                    }
+                    if(!c.details.get("engine_fuel").equals("null")){
+                        dataText.append("\nFuel Type: " + c.details.get("engine_fuel"));
+                    }
+                    if(!c.details.get("top_speed_kmh").equals("null")){
+                        dataText.append("\nTop Speed: " + c.details.get("top_speed_kmh")+" Km/h");
+                    }
+                    if(!c.details.get("top_speed_mph").equals("null")){
+                        dataText.append("\nTop Speed: " + c.details.get("top_speed_mph")+" mph");
+                    }
+                    if(!c.details.get("kph0to100").equals("null")){
+                        dataText.append("\n0 To 100 Km/h: " + c.details.get("kph0to100")+" sec");
+                    }
+                    if(!c.details.get("drive").equals("null") ){
+                        dataText.append("\nDrive Type: " + c.details.get("drive"));
+                    }
+                    if(!c.details.get("transmission").equals("null")){
+                        dataText.append("\nTransmission Type: " + c.details.get("transmission"));
+                    }
+                    if(!c.details.get("seats").equals("null")){
+                        dataText.append("\n# of Seats: " + c.details.get("seats"));
+                    }
+                    if(!c.details.get("doors").equals("null")){
+                        dataText.append("\n# of Doors: " + c.details.get("doors"));
+                    }
+                    if(!c.details.get("weight_kg").equals("null")){
+                        dataText.append("\nWeight: " + c.details.get("weight_kg")+ " kg");
+                    }
+                    if(!c.details.get("weight_ibs") .equals("null")){
+                        dataText.append("\nWeight: " + c.details.get("weight_ibs")+" lbs");
+                    }
+                    if(!c.details.get("length_mm").equals("null")){
+                        dataText.append("\nLength: " + c.details.get("transmission")+ " mm");
+                    }
+                    if(!c.details.get("length_in").equals("null")){
+                        dataText.append("\nLength: " + c.details.get("length_in")+" in");
+                    }
+                    if(!c.details.get("height_mm").equals("null")){
+                        dataText.append("\nHeight: " + c.details.get("height_mm")+ " mm");
+                    }
+                    if(!c.details.get("height_in").equals("null")){
+                        dataText.append("\nHeight: " + c.details.get("height_in")+" in");
+                    }
+                    if(!c.details.get("width_mm").equals("null")){
+                        dataText.append("\nWidth: " + c.details.get("width_mm")+" mm");
+                    }
+                    if(!c.details.get("width_in").equals("null")){
+                        dataText.append("\nWidth: " + c.details.get("width_in")+" in");
+                    }
+                    if(!c.details.get("hwy_lkm").equals("null")){
+                        dataText.append("\nHighway Economy: " + c.details.get("hwy_lkm")+" L/Km");
+                    }
+                    if(!c.details.get("hwy_mpg").equals("null")){
+                        dataText.append("\nHighway Economy: " + c.details.get("hwy_mpg")+" mpg");
+                    }
+                    if(!c.details.get("city_lkm").equals("null")){
+                        dataText.append("\nCity Economy: " + c.details.get("city_lkm")+" L/Km");
+                    }
+                    if(!c.details.get("city_mpg").equals("null")){
+                        dataText.append("\nCity Economy: " + c.details.get("city_mpg")+" mpg");
+                    }
+                    if(!c.details.get("mixed_lkm").equals("null")){
+                        dataText.append("\nMixed Economy: " + c.details.get("mixed_lkm")+" L/Km");
+                    }
+                    if(!c.details.get("mixed_mpg").equals("null")){
+                        dataText.append("\nMixed Economy: " + c.details.get("mixed_mpg")+" mpg");
+                    }
+                    if(!c.details.get("fuel_capacity_l").equals("null")){
+                        dataText.append("\nFuel Capacity: " + c.details.get("fuel_capacity_l")+" L");
+                    }
+                    if(!c.details.get("fuel_capacity_g").equals("null")){
+                        dataText.append("\nFuel Capacity: " + c.details.get("fuel_capacity_g")+" g");
+                    }
+                    if(!c.details.get("engine_hp").equals("null")){
+                        dataText.append("\nHorsepower: " + c.details.get("engine_hp")+" HP");
+                    }
+                    if(!c.details.get("sold_in_us").equals("null")){
+                        dataText.append("\nSold In U.S.: " + c.details.get("sold_in_us"));
+                    }
+                    if(!c.details.get("country").equals("null")){
+                        dataText.append("\nCountry: " + c.details.get("country"));
+                    }
+
                     return true;
 
                 }
