@@ -192,7 +192,7 @@ public class LoginActivity extends Activity {
 	private void addUser(JSONObject response){
 		SQLiteHandler db;
 		db = new SQLiteHandler(getApplicationContext());
-		db.createCarDB();
+		//db.createCarDB();
 		try {
 			String uid = response.getString("uid");
 

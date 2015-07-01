@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 			logoutUser();
 		}
 
-		Log.d("Main", "DB rows: "+db.getRowCount());
+		//Log.d("Main", "DB rows: "+db.getRowCount());
 		// Fetching user details from sqlite
 		HashMap<String, String> user = db.getUserDetails();
 

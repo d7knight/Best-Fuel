@@ -50,7 +50,8 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_LOGIN_TABLE);
 
 		Log.d(TAG, "Database tables created");
-		createCarDB();
+		createCarDB(db);
+		createPreferencesDB(db);
 	}
 
 
@@ -64,9 +65,37 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
+	public void createPreferencesDB(SQLiteDatabase db) {
+		//SQLiteDatabase db = this.getWritableDatabase();
+		String CREATE_PREF_TABLE = "CREATE TABLE IF NOT EXISTS Pref_Table (name TEXT, " +
+				"airport BOOLEAN, "+
+				"atm BOOLEAN, "+
+				"bakery BOOLEAN, "+
+				"bank BOOLEAN, "+
+				"bar BOOLEAN, "+
+				"cafe BOOLEAN, "+
+				"car_dealer BOOLEAN, "+
+				"car_wash BOOLEAN, "+
+				"convenience_store BOOLEAN, "+
+				"food BOOLEAN, "+
+				"hospital BOOLEAN, "+
+				"liquor_store BOOLEAN, "+
+				"lodging BOOLEAN, "+
+				"meal_delivery BOOLEAN, "+
+				"park BOOLEAN, "+
+				"parking BOOLEAN, "+
+				"restaurant BOOLEAN, "+
+				"shopping_mall BOOLEAN, "+
+				"prices INT, "+
+				"open_only BOOLEAN)";
+		db.execSQL(CREATE_PREF_TABLE);
+		Log.d(TAG, "Database preference table created");
+
+	}
+
 	//creates table for car data
-	public void createCarDB() {
-		SQLiteDatabase db = this.getWritableDatabase();
+	public void createCarDB(SQLiteDatabase db) {
+		//SQLiteDatabase db = this.getWritableDatabase();
 		String CREATE_CAR_TABLE = "CREATE TABLE IF NOT EXISTS car_table (name TEXT, " +
 				"isdefault BOOLEAN, "+
 				"year INT," +
@@ -246,6 +275,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 		String query = "DELETE FROM car_table WHERE id ='" + id + "' AND name ='" + name+"'";
 		db.execSQL(query);
+		db.close(); // Closing database connection
 	}
 
 	public ArrayList<HashMap<String, String>> getCars(String name){
@@ -378,6 +408,25 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		cursor.close();
 		db.close();
 		return car;
+	}
+
+
+	public HashMap<String, String> getPref(String name) {
+		HashMap<String, String> prefs= new HashMap<String, String>();
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT * FROM Pref_Table WHERE name='"+name+"'";
+
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		cursor.moveToFirst();
+		if (cursor.getCount() > 0) {
+
+		}
+		return prefs;
+	}
+
+	public void savePrefs(HashMap<String, String> prefs) {
+
 	}
 
 }
