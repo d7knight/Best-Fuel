@@ -68,6 +68,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 	public void createPreferencesDB(SQLiteDatabase db) {
 		//SQLiteDatabase db = this.getWritableDatabase();
 		String CREATE_PREF_TABLE = "CREATE TABLE IF NOT EXISTS Pref_Table (name TEXT, " +
+				"fuel_type INT, "+ //0 = regular, 1= premium, 2= diesel
 				"airport BOOLEAN, "+
 				"atm BOOLEAN, "+
 				"bakery BOOLEAN, "+
