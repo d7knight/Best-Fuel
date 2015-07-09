@@ -17,7 +17,11 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
-
+    <style name="pricerating" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/pricefull</item>
+        <item name="android:minHeight">12dp</item>
+        <item name="android:maxHeight">12dp</item>
+    </style>
 
 
 </resources>

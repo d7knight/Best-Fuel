@@ -64,6 +64,8 @@ public class ProfileActivity extends Activity {
     CarAdapter adapter;
     ArrayList<Car> arraylist=new ArrayList<Car>();
 
+
+
     CQInterface cq;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,22 +157,22 @@ public class ProfileActivity extends Activity {
             public void onClick(View v) {
                 //check if all fields are filled out
                 //if(trimSpin.getAdapter().getCount() >0) {}
-                if(carText.getText() != ""){
+                if (carText.getText() != "") {
                     //TODO actually make use of the tons of car data!
                     //ideas include: show base data on profile. Click and opens up to lots of great stuff.
                     //give option of either Liter per km or Mpg
                     String cap = "";
-                    String hwy ="";
-                    String city ="";
-                    String id="";
+                    String hwy = "";
+                    String city = "";
+                    String id = "";
                     try {
                         JSONArray jArray = new JSONArray(fullCarString);
                         JSONObject jObj = jArray.getJSONObject(0);
                         addCarToDB(fullCarString, name);
-                        cap = jObj.getString("model_fuel_cap_l") +"L Tank";
-                        hwy = jObj.getString("model_lkm_hwy")+" L/Km Highway";
-                        city = jObj.getString("model_lkm_city")+" L/Km City";
-                        id= jObj.getString("model_id");
+                        cap = jObj.getString("model_fuel_cap_l") + "L Tank";
+                        hwy = jObj.getString("model_lkm_hwy") + " L/Km Highway";
+                        city = jObj.getString("model_lkm_city") + " L/Km City";
+                        id = jObj.getString("model_id");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -191,6 +193,18 @@ public class ProfileActivity extends Activity {
             }
         });
 
+
+        FrameLayout profileFrame = (FrameLayout) findViewById(R.id.profilelayout);
+        profileFrame.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d("PROFILE", "Clicked on profile");
+                addProfileDialogue();
+
+                //cq.getYears();
+                return true;
+            }
+        });
 
     }
 
@@ -475,6 +489,26 @@ public class ProfileActivity extends Activity {
         finish();
     }
 
+    public void addProfileDialogue() {
+        final View profileInflated = getLayoutInflater().inflate(R.layout.profile_pref, null, false);
+        final AlertDialog profdialog = new AlertDialog.Builder(ProfileActivity.this)
+            .setView(profileInflated)
+            .setTitle("Profile Preferences")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        Spinner gasSpin = (Spinner) profileInflated.findViewById(R.id.gasPref);
+        final ArrayList<String> gasString = new ArrayList<String>();
+        gasString.add("Regular");
+        gasString.add("Premium");
+        gasString.add("Diesel");
+        final ArrayAdapter<String> gasAdapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_item, gasString );
+        gasSpin.setAdapter(gasAdapter);
+        profdialog.show();
+    }
 
     public void addCarDialogue(View inflated){
 
