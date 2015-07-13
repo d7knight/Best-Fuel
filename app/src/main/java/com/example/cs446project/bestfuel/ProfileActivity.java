@@ -158,9 +158,6 @@ public class ProfileActivity extends Activity {
                 //check if all fields are filled out
                 //if(trimSpin.getAdapter().getCount() >0) {}
                 if (carText.getText() != "") {
-                    //TODO actually make use of the tons of car data!
-                    //ideas include: show base data on profile. Click and opens up to lots of great stuff.
-                    //give option of either Liter per km or Mpg
                     String cap = "";
                     String hwy = "";
                     String city = "";
@@ -177,9 +174,9 @@ public class ProfileActivity extends Activity {
                         e.printStackTrace();
                     }
                     HashMap<String, String> recentCar = db.getCar(false, name, Integer.parseInt(id));
-
-                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city, id, recentCar));
-                    adapter.notifyDataSetChanged();
+                    resetCars();
+                    //adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city, id, recentCar));
+                    //adapter.notifyDataSetChanged();
                     addDialog.dismiss();
                 }
             }
@@ -208,6 +205,13 @@ public class ProfileActivity extends Activity {
 
     }
 
+    public void resetCars(){
+        arraylist.clear();
+        adapter.clear();
+        adapter = new CarAdapter(this, arraylist);
+        populateCars(userName, db);
+    }
+
     public void populateCars(String name, SQLiteHandler db) {
         ArrayList<HashMap<String, String>> retList = db.getCars(name);
         for (int i=0; i<retList.size(); i++) {
@@ -215,6 +219,7 @@ public class ProfileActivity extends Activity {
                     ""+retList.get(i).get("hwy_lkm")+" L/Km City", ""+retList.get(i).get("city_lkm")+" L/Km Highway", retList.get(i).get("id"),
                     retList.get(i)));
         }
+        adapter.notifyDataSetChanged();
     }
 
     public void addCarToDB(String carString, String name) {
@@ -256,7 +261,6 @@ public class ProfileActivity extends Activity {
            this.city=city;
            this.id=id;
            this.details = allDetails;
-           Log.d("CARADD", "country is "+this.details.get("countr"));
        }
    }
 
@@ -313,11 +317,12 @@ public class ProfileActivity extends Activity {
             final String name = userName;
             final String setName = c.make +" "+c.model+ " Settings";
             Boolean isDefault;
-            if(position==0){
+            if(c.details.get("isdefault").equals("true")){
                 isDefault=true;
             } else {
                 isDefault=false;
             }
+            Log.d("CarView", "Car "+c.model+" is default="+isDefault+" c default is "+c.details.get("isdefault"));
             final Boolean curDefault = isDefault;
 
 
@@ -328,11 +333,25 @@ public class ProfileActivity extends Activity {
                 public boolean onLongClick(View arg0) {
                     // Send single item click data to SingleItemView Class
                     final View customView = inflater.inflate(R.layout.manage_car_dialog, null);
+                    final CheckBox defCheck = (CheckBox) customView.findViewWithTag("Default");
+                    Log.d("ManageCar", "is it checked? "+curDefault);
                     final AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
                             .setTitle(setName)
                             .setView(customView)
                             .setPositiveButton("Finish", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
+                                    Log.d("ManageCar", "Finish Clicked");
+                                    if(curDefault && defCheck.isChecked()==false){//was default, clicked off
+                                        db.defaultCarUpdate(name, null);
+                                        Log.d("ManageCar", "Was default, no longer");
+                                        resetCars();
+                                    } else if(!curDefault && defCheck.isChecked()==true){//wasnt default, now is
+                                        db.defaultCarUpdate(name, c.details.get("id"));
+                                        Log.d("ManageCar", "New default car");
+                                        resetCars();
+                                    } else {
+                                        Log.d("ManageCar", "nothing changed");
+                                    }
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -353,7 +372,6 @@ public class ProfileActivity extends Activity {
                             dialog.dismiss();
                         }
                     });
-                    CheckBox defCheck = (CheckBox) customView.findViewWithTag("Default");
                     defCheck.setChecked(curDefault);
                     TextView dataText = (TextView) customView.findViewWithTag("DataText");
                     dataText.setText("");

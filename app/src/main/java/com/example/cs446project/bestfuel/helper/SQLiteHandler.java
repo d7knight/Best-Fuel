@@ -353,7 +353,8 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 	public HashMap<String, String> getCar(Boolean isdefault, String name, int id) {
 		String selectQuery ;
 		if(isdefault==true) {
-			selectQuery="SELECT * FROM car_table WHERE name='"+name+"' AND isdefault='1'";
+			selectQuery="SELECT * FROM car_table WHERE name='"+name+"' AND isdefault='true'";
+			Log.d(TAG,"Checking for default car");
 		} else {
 			selectQuery="SELECT * FROM car_table WHERE name='"+name+"' AND id='"+id+"'";
 		}
@@ -362,8 +363,9 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		cursor.moveToFirst();
-		Log.d(TAG, "Grabbing Default car with user "+name+" and default "+isdefault);
+		Log.d(TAG, "Grabbing Default car with user " + name + " and default " + isdefault);
 		if (cursor.getCount() > 0) {
+			Log.d(TAG, "Grabbing cursor");
 			car.put("name", cursor.getString(0));
 			car.put("isdefault", cursor.getString(1));
 			car.put("year", cursor.getString(2));
@@ -411,6 +413,28 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		return car;
 	}
 
+	public void defaultCarUpdate(String username, String id){
+		//first get current default car
+		HashMap<String,String> defCar = getCar(true, username, -1);
+		//now change it to not-default
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues args = new ContentValues();
+		args.put("isdefault", "false");
+		Log.d(TAG, "Default car had name "+defCar.get("name")+" and id "+defCar.get("id"));
+		int a =db.update("car_table", args, "name='" + username + "' AND id='" + defCar.get("id")+"'", null);
+		Log.d(TAG,"default car update 1 was "+a);
+
+		//update new car if needed
+		if(id!=null && id!=""){
+			ContentValues args2 = new ContentValues();
+			args2.put("isdefault", "true");
+			int b =db.update("car_table", args2, "name='" + username + "' AND id=" + id, null);
+			Log.d(TAG, "default car update 2 was " + b);
+		}
+		db.close();
+
+	}
+
 
 	public HashMap<String, String> getPref(String name) {
 		HashMap<String, String> prefs= new HashMap<String, String>();
@@ -426,7 +450,74 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		return prefs;
 	}
 
-	public void savePrefs(HashMap<String, String> prefs) {
+	public void defaultPrefs(String username) {
+		SQLiteDatabase dbr = this.getReadableDatabase();
+		SQLiteDatabase db = this.getWritableDatabase();
+		String checkQuery = "SELECT * FROM Pref_Table WHERE name='"+username+"'";
+
+		Cursor cursor = dbr.rawQuery(checkQuery, null);
+		if(cursor.getCount()==0) {
+
+
+			ContentValues values = new ContentValues();
+			values.put("name", username);
+			values.put("fuel_type", 0);
+			values.put("airport", false);
+			values.put("atm", false);
+			values.put("bakery", false);
+			values.put("bank", false);
+			values.put("bar", false);
+			values.put("cafe", true);
+			values.put("car_dealer", false);
+			values.put("car_wash", true);
+			values.put("convenience_store", true);
+			values.put("food", true);
+			values.put("hospital", true);
+			values.put("liquor_store", false);
+			values.put("lodging", false);
+			values.put("meal_delivery", true);
+			values.put("park", false);
+			values.put("parking", true);
+			values.put("restaurant", true);
+			values.put("shopping_mall", false);
+			values.put("prices", 4);
+			values.put("open_only", false);
+			db.insert("Pref_Table", null, values);
+			db.close(); // Closing database connection
+			Log.d(TAG, "Created default preferences");
+		} else {
+			Log.d(TAG,"User has existing preferences");
+		}
+	}
+
+	public void updatePrefs(HashMap<String, String> prefs, String username) {
+
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put("fuel_type", prefs.get("fuel_type"));
+		values.put("airport",  prefs.get("airport"));
+		values.put("atm",  prefs.get("atm"));
+		values.put("bakery",  prefs.get("bakery"));
+		values.put("bank",  prefs.get("bank"));
+		values.put("bar",  prefs.get("bar"));
+		values.put("cafe",  prefs.get("cafe"));
+		values.put("car_dealer",  prefs.get("car_dealer"));
+		values.put("car_wash",  prefs.get("car_wash"));
+		values.put("convenience_store",  prefs.get("convenience_store"));
+		values.put("food",  prefs.get("food"));
+		values.put("hospital",  prefs.get("hospital"));
+		values.put("liquor_store",  prefs.get("liquor_store"));
+		values.put("lodging",  prefs.get("lodging"));
+		values.put("meal_delivery",  prefs.get("meal_delivery"));
+		values.put("park",  prefs.get("park"));
+		values.put("parking",  prefs.get("parking"));
+		values.put("restaurant",  prefs.get("restaurant"));
+		values.put("shopping_mall",  prefs.get("shopping_mall"));
+		values.put("prices",  prefs.get("prices"));
+		values.put("open_only",  prefs.get("open_only"));
+		db.update("Pref_Table", values, "name='" + username + "'", null);
+		Log.d(TAG, "Preferences Updated");
 
 	}
 

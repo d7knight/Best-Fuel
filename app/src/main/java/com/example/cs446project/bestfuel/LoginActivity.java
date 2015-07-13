@@ -201,6 +201,7 @@ public class LoginActivity extends Activity {
 			String email = user.getString("email");
 			String created_at = user.getString("created_at");
 			db.addUser(name, email, uid, created_at);
+			db.defaultPrefs(name);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
