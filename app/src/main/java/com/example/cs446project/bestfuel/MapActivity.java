@@ -30,6 +30,8 @@ import com.example.cs446project.bestfuel.helper.StationAlgorithm;
 import java.io.File;
 import java.security.Provider;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MapActivity extends Activity {
@@ -77,6 +79,7 @@ public class MapActivity extends Activity {
         MapActivity.clearCache(mContext,0);
 
         WebView webview=(WebView)findViewById(R.id.webkit);
+        webview.clearCache(true);
         webview.getSettings().setJavaScriptEnabled(true);
         //Inject WebAppInterface methods into Web page by having Interface name 'Android'
         waInterface = new WebAppInterface(this, webview);
@@ -95,9 +98,11 @@ public class MapActivity extends Activity {
             saCreated = true;
         }
 
+        Map<String, String> noCacheHeaders = new HashMap<String, String>(2);
+        noCacheHeaders.put("Pragma", "no-cache");
+        noCacheHeaders.put("Cache-Control", "no-cache");
+        webview.loadUrl(AppConfig.URL_MAP,noCacheHeaders);
 
-        webview.loadUrl(AppConfig.URL_MAP);
-        webview.clearCache(true);
 
 
 
