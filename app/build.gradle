@@ -11,11 +11,27 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    signingConfigs {
+        release {
+            storeFile file("C:\\Users\\David\\OneDrive\\keystore.jks")
+            storePassword "onetwo"
+            keyAlias "Dave"
+            keyPassword "onetwo"
+        }
+    }
     buildTypes {
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
+
+
+
+
+
+
     }
 }
 

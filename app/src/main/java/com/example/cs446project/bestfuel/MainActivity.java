@@ -83,11 +83,13 @@ public class MainActivity extends Activity {
 	}
 	public void gasNow(View v){
 		Intent intent = new Intent(MainActivity.this, MapActivity.class);
+		intent.putExtra("mode", "getGasNow");
 		startActivity(intent);
 
 	}
 	public void planRoute(View v){
 		Intent intent = new Intent(MainActivity.this, MapActivity.class);
+		intent.putExtra("mode", "planRoute");
 		startActivity(intent);
 	}
 }
