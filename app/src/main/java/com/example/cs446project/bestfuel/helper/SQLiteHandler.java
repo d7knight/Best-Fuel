@@ -436,17 +436,43 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 	}
 
 
-	public HashMap<String, String> getPref(String name) {
-		HashMap<String, String> prefs= new HashMap<String, String>();
+	public ContentValues getPrefs(String username) {
+		ContentValues prefs= new ContentValues();
 		SQLiteDatabase db = this.getReadableDatabase();
-		String selectQuery = "SELECT * FROM Pref_Table WHERE name='"+name+"'";
+		String selectQuery = "SELECT * FROM Pref_Table WHERE name='"+username+"'";
 
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		cursor.moveToFirst();
 		if (cursor.getCount() > 0) {
-
+			prefs.put("name", cursor.getString(0));
+			prefs.put("fuel_type", cursor.getInt(1));
+			prefs.put("airport", cursor.getInt(2)==1);
+			prefs.put("atm", cursor.getInt(3)==1);
+			prefs.put("bakery", cursor.getInt(4)==1);
+			prefs.put("bank", cursor.getInt(5)==1);
+			prefs.put("bar", cursor.getInt(6)==1);
+			prefs.put("cafe", cursor.getInt(7)==1);
+			prefs.put("car_dealer", cursor.getInt(8)==1);
+			prefs.put("car_wash", cursor.getInt(9)==1);
+			prefs.put("convenience_store", cursor.getInt(10)==1);
+			prefs.put("food", cursor.getInt(11)==1);
+			prefs.put("hospital", cursor.getInt(12)==1);
+			prefs.put("liquor_store", cursor.getInt(13)==1);
+			prefs.put("lodging", cursor.getInt(14)==1);
+			prefs.put("meal_delivery", cursor.getInt(15)==1);
+			prefs.put("park", cursor.getInt(16)==1);
+			prefs.put("parking", cursor.getInt(17)==1);
+			prefs.put("restaurant", cursor.getInt(18)==1);
+			prefs.put("shopping_mall", cursor.getInt(19)==1);
+			prefs.put("prices", cursor.getInt(20));//range 1 to 4
+			prefs.put("open_only", cursor.getInt(21)==1);
+			Log.d(TAG, "cursor 1 name is " + cursor.getString(0));
+			Log.d(TAG,"airport is "+cursor.getString(2));
+			Log.d(TAG,"airport is (check) "+(cursor.getInt(2)==1));
 		}
+		cursor.close();
+		db.close();
 		return prefs;
 	}
 
@@ -490,35 +516,36 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		}
 	}
 
-	public void updatePrefs(HashMap<String, String> prefs, String username) {
+	public void updatePrefs(ContentValues prefs, String username) {
 
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
-		values.put("fuel_type", prefs.get("fuel_type"));
-		values.put("airport",  prefs.get("airport"));
-		values.put("atm",  prefs.get("atm"));
-		values.put("bakery",  prefs.get("bakery"));
-		values.put("bank",  prefs.get("bank"));
-		values.put("bar",  prefs.get("bar"));
-		values.put("cafe",  prefs.get("cafe"));
-		values.put("car_dealer",  prefs.get("car_dealer"));
-		values.put("car_wash",  prefs.get("car_wash"));
-		values.put("convenience_store",  prefs.get("convenience_store"));
-		values.put("food",  prefs.get("food"));
-		values.put("hospital",  prefs.get("hospital"));
-		values.put("liquor_store",  prefs.get("liquor_store"));
-		values.put("lodging",  prefs.get("lodging"));
-		values.put("meal_delivery",  prefs.get("meal_delivery"));
-		values.put("park",  prefs.get("park"));
-		values.put("parking",  prefs.get("parking"));
-		values.put("restaurant",  prefs.get("restaurant"));
-		values.put("shopping_mall",  prefs.get("shopping_mall"));
-		values.put("prices",  prefs.get("prices"));
-		values.put("open_only",  prefs.get("open_only"));
+		values.put("fuel_type", prefs.getAsInteger("fuel_type"));
+		values.put("airport",  prefs.getAsBoolean("airport"));
+		values.put("atm",  prefs.getAsBoolean("atm"));
+		values.put("bakery",  prefs.getAsBoolean("bakery"));
+		values.put("bank",  prefs.getAsBoolean("bank"));
+		values.put("bar",  prefs.getAsBoolean("bar"));
+		values.put("cafe",  prefs.getAsBoolean("cafe"));
+		values.put("car_dealer",  prefs.getAsBoolean("car_dealer"));
+		values.put("car_wash",  prefs.getAsBoolean("car_wash"));
+		values.put("convenience_store",  prefs.getAsBoolean("convenience_store"));
+		values.put("food",  prefs.getAsBoolean("food"));
+		values.put("hospital",  prefs.getAsBoolean("hospital"));
+		values.put("liquor_store",  prefs.getAsBoolean("liquor_store"));
+		values.put("lodging",  prefs.getAsBoolean("lodging"));
+		values.put("meal_delivery",  prefs.getAsBoolean("meal_delivery"));
+		values.put("park",  prefs.getAsBoolean("park"));
+		values.put("parking",  prefs.getAsBoolean("parking"));
+		values.put("restaurant",  prefs.getAsBoolean("restaurant"));
+		values.put("shopping_mall",  prefs.getAsBoolean("shopping_mall"));
+		values.put("prices",  prefs.getAsInteger("prices"));
+		values.put("open_only", prefs.getAsBoolean("open_only"));
 		db.update("Pref_Table", values, "name='" + username + "'", null);
 		Log.d(TAG, "Preferences Updated");
 
+		db.close();
 	}
 
 }

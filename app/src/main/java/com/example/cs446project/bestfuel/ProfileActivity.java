@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +46,7 @@ public class ProfileActivity extends Activity {
     private SQLiteHandler db;
     private SessionManager session;
     private String userName;
+    private String email;
     private ArrayList<String> carYears = new ArrayList<String>();
     private View inflated;
     private Spinner yearSpin;
@@ -104,7 +107,7 @@ public class ProfileActivity extends Activity {
         //Profile Data ========================================
         final String name = user.get("name");
         userName=name;
-        String email = user.get("email");
+        email = user.get("email");
 
         TextView nameTxt = (TextView) findViewById(R.id.profileName);
         nameTxt.setText(name);
@@ -509,11 +512,58 @@ public class ProfileActivity extends Activity {
 
     public void addProfileDialogue() {
         final View profileInflated = getLayoutInflater().inflate(R.layout.profile_pref, null, false);
+        final TextView nameBox = (TextView) profileInflated.findViewById(R.id.profileName2);
+        final TextView emailBox = (TextView) profileInflated.findViewById(R.id.profileEmail2);
+        final Spinner gasType = (Spinner) profileInflated.findViewById(R.id.gasPref);
+        final CheckBox airport = (CheckBox) profileInflated.findViewById(R.id.airport);
+        final CheckBox atm = (CheckBox) profileInflated.findViewById(R.id.atm);
+        final CheckBox bakery = (CheckBox) profileInflated.findViewById(R.id.bakery);
+        final CheckBox bank = (CheckBox) profileInflated.findViewById(R.id.bank);
+        final CheckBox bar = (CheckBox) profileInflated.findViewById(R.id.bar);
+        final CheckBox cafe = (CheckBox) profileInflated.findViewById(R.id.cafe);
+        final CheckBox cardealer = (CheckBox) profileInflated.findViewById(R.id.cardealer);
+        final CheckBox carwash = (CheckBox) profileInflated.findViewById(R.id.carwash);
+        final CheckBox convenience = (CheckBox) profileInflated.findViewById(R.id.convenience);
+        final CheckBox food = (CheckBox) profileInflated.findViewById(R.id.food);
+        final CheckBox hospital = (CheckBox) profileInflated.findViewById(R.id.hospital);
+        final CheckBox liquor = (CheckBox) profileInflated.findViewById(R.id.liquor);
+        final CheckBox lodging = (CheckBox) profileInflated.findViewById(R.id.lodging);
+        final CheckBox mealdelivery = (CheckBox) profileInflated.findViewById(R.id.mealdelivery);
+        final CheckBox park = (CheckBox) profileInflated.findViewById(R.id.park);
+        final CheckBox parking = (CheckBox) profileInflated.findViewById(R.id.parking);
+        final CheckBox restaurant = (CheckBox) profileInflated.findViewById(R.id.restaurant);
+        final CheckBox mall = (CheckBox) profileInflated.findViewById(R.id.mall);
+        final RatingBar prices = (RatingBar) profileInflated.findViewById(R.id.price);
+        final CheckBox open = (CheckBox) profileInflated.findViewById(R.id.open);
+
+
         final AlertDialog profdialog = new AlertDialog.Builder(ProfileActivity.this)
             .setView(profileInflated)
             .setTitle("Profile Preferences")
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
+                        ContentValues newprefs = new ContentValues();
+                        newprefs.put("fuel_type", gasType.getSelectedItemPosition());
+                        newprefs.put("airport", airport.isChecked());
+                        newprefs.put("atm", atm.isChecked());
+                        newprefs.put("bakery", bakery.isChecked());
+                        newprefs.put("bank", bank.isChecked());
+                        newprefs.put("cafe", cafe.isChecked());
+                        newprefs.put("car_dealer", cardealer.isChecked());
+                        newprefs.put("car_wash", carwash.isChecked());
+                        newprefs.put("convenience_store", convenience.isChecked());
+                        newprefs.put("food", food.isChecked());
+                        newprefs.put("hospital", hospital.isChecked());
+                        newprefs.put("liquor_store", liquor.isChecked());
+                        newprefs.put("lodging", lodging.isChecked());
+                        newprefs.put("meal_delivery", mealdelivery.isChecked());
+                        newprefs.put("park", park.isChecked());
+                        newprefs.put("parking", parking.isChecked());
+                        newprefs.put("restaurant", restaurant.isChecked());
+                        newprefs.put("shopping_mall", mall.isChecked());
+                        newprefs.put("open", open.isChecked());
+                        newprefs.put("prices", prices.getRating());
+                        db.updatePrefs(newprefs, userName);
                         dialog.dismiss();
                     }
                 })
@@ -525,6 +575,36 @@ public class ProfileActivity extends Activity {
         gasString.add("Diesel");
         final ArrayAdapter<String> gasAdapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_item, gasString );
         gasSpin.setAdapter(gasAdapter);
+        ContentValues prefs = db.getPrefs(userName);
+
+        //alter various things to match actual preferences
+        nameBox.setText(userName);
+        emailBox.setText(email);
+        gasType.setSelection(prefs.getAsInteger("fuel_type"));
+        airport.setChecked(prefs.getAsBoolean("airport"));
+        atm.setChecked(prefs.getAsBoolean("atm"));
+        bakery.setChecked(prefs.getAsBoolean("bakery"));
+        bank.setChecked(prefs.getAsBoolean("bank"));
+        bar.setChecked(prefs.getAsBoolean("bar"));
+        cafe.setChecked(prefs.getAsBoolean("cafe"));
+        cardealer.setChecked(prefs.getAsBoolean("car_dealer"));
+        carwash.setChecked(prefs.getAsBoolean("car_wash"));
+        convenience.setChecked(prefs.getAsBoolean("convenience_store"));
+        food.setChecked(prefs.getAsBoolean("food"));
+        hospital.setChecked(prefs.getAsBoolean("hospital"));
+        liquor.setChecked(prefs.getAsBoolean("liquor_store"));
+        lodging.setChecked(prefs.getAsBoolean("lodging"));
+        mealdelivery.setChecked(prefs.getAsBoolean("meal_delivery"));
+        park.setChecked(prefs.getAsBoolean("park"));
+        parking.setChecked(prefs.getAsBoolean("parking"));
+        restaurant.setChecked(prefs.getAsBoolean("restaurant"));
+        mall.setChecked(prefs.getAsBoolean("shopping_mall"));
+        open.setChecked(prefs.getAsBoolean("open_only"));
+        prices.setRating(prefs.getAsInteger("prices"));
+
+
+        Log.d("ProfilePrefs", "fueltype is " + prefs.getAsInteger("fuel_type")+" and airport is "+prefs.get("airport"));
+
         profdialog.show();
     }
 

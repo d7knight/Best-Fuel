@@ -314,11 +314,11 @@
                     android:text="Parks" />
 
                 <CheckBox
-                    android:id="@+id/restaurant"
+                    android:id="@+id/parking"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Restaurants" />
+                    android:text="Parking" />
             </LinearLayout>
 
             <LinearLayout
@@ -328,6 +328,12 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
+                <CheckBox
+                    android:id="@+id/restaurant"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Restaurants" />
                 <CheckBox
                     android:id="@+id/mall"
                     android:layout_width="0dp"
@@ -385,6 +391,7 @@
 
                 <RatingBar
                     style="?android:attr/ratingBarStyleSmall"
+                    android:id="@+id/price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
