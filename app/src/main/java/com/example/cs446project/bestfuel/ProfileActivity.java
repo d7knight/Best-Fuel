@@ -8,7 +8,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.Spinner;
@@ -35,6 +40,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +72,11 @@ public class ProfileActivity extends Activity {
     private String fullCarString;
     private ProgressDialog pDialog;
     private Dialog addDialog;
+
+    private ImageView image;
+    private Car pictureCar;
+
+
     ListView list;
     CarAdapter adapter;
     ArrayList<Car> arraylist=new ArrayList<Car>();
@@ -152,6 +166,7 @@ public class ProfileActivity extends Activity {
         Button noBtn = (Button) inflated.findViewById(R.id.carDialogNo);
 
 
+
         populateCars(user.get("name"), db);
 
         yesBtn.setOnClickListener(new Button.OnClickListener() {
@@ -214,15 +229,45 @@ public class ProfileActivity extends Activity {
         adapter = new CarAdapter(this, arraylist);
         populateCars(userName, db);
     }
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            image.setImageBitmap(imageBitmap);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] photo = baos.toByteArray();
+            //TODO foreign key should be the email address instead of the username. We could have multiple people with the same username
+            //Fix updatePicture to use the email instead
+            db.updateCarPicture(userName,pictureCar.id,photo);
+        }
+    }
 
     public void populateCars(String name, SQLiteHandler db) {
-        ArrayList<HashMap<String, String>> retList = db.getCars(name);
-        for (int i=0; i<retList.size(); i++) {
-            adapter.add(new Car(retList.get(i).get("make"), retList.get(i).get("model"), retList.get(i).get("year"), "" +retList.get(i).get("fuel_capacity_l")+" L Tank" ,
-                    ""+retList.get(i).get("hwy_lkm")+" L/Km City", ""+retList.get(i).get("city_lkm")+" L/Km Highway", retList.get(i).get("id"),
-                    retList.get(i)));
+        try {
+            ArrayList<HashMap<String, String>> retList = db.getCars(name);
+
+            for (int i = 0; i < retList.size(); i++) {
+                byte[] picture=db.getCarPicture(name,retList.get(i).get("id"));
+                adapter.add(new Car(retList.get(i).get("make"), retList.get(i).get("model"), retList.get(i).get("year"), "" + retList.get(i).get("fuel_capacity_l") + " L Tank",
+                        "" + retList.get(i).get("hwy_lkm") + " L/Km City", "" + retList.get(i).get("city_lkm") + " L/Km Highway", retList.get(i).get("id"),picture,
+                        retList.get(i)));
+            }
+            adapter.notifyDataSetChanged();
         }
-        adapter.notifyDataSetChanged();
+        catch(Exception e){
+            Log.d("populateCars","Exception ",e);
+        }
     }
 
     public void addCarToDB(String carString, String name) {
@@ -234,6 +279,7 @@ public class ProfileActivity extends Activity {
                 Log.d("Profile", "car is not default");
                 isdefault =false;
             }
+            //TODO We should have the foreign key to a user in the car table being the users email not the name as the email is the primary key to the account
             db.addCar(name, isdefault, Integer.toString(setYear), setMake,setModel,jObj.getString("model_id"),jObj.getString("model_body"),
                     jObj.getString("model_engine_position"), jObj.getString("model_engine_cc"),jObj.getString("model_engine_cyl"),
                     jObj.getString("model_engine_type"), jObj.getString("model_engine_valves_per_cyl"), jObj.getString("model_engine_power_rpm"), jObj.getString("model_engine_fuel"),
@@ -243,7 +289,7 @@ public class ProfileActivity extends Activity {
                    jObj.getString("model_lkm_mixed"), jObj.getString("model_lkm_city"), jObj.getString("model_fuel_cap_l"), jObj.getString("model_sold_in_us"),
                    jObj.getString("model_engine_power_hp"), jObj.getString("model_top_speed_mph"), jObj.getString("model_weight_lbs"), jObj.getString("model_length_in"),
                    jObj.getString("model_width_in"), jObj.getString("model_height_in"), jObj.getString("model_mpg_hwy"), jObj.getString("model_mpg_city"),
-                    jObj.getString("model_mpg_mixed"), jObj.getString("model_fuel_cap_g"), jObj.getString("make_country"));
+                    jObj.getString("model_mpg_mixed"), jObj.getString("model_fuel_cap_g"), jObj.getString("make_country"), null );
 
             Log.d("ADDCARTODB", "returned");
         } catch (JSONException e) {
@@ -254,8 +300,9 @@ public class ProfileActivity extends Activity {
 
    public class Car{
        String make,model,year,capacity,hwy,city,id;
+       byte[] picture;
        HashMap<String, String> details;
-       public Car(String make, String model, String year, String capacity, String hwy, String city, String id, HashMap<String, String> allDetails){
+       public Car(String make, String model, String year, String capacity, String hwy, String city, String id,byte[] picture, HashMap<String, String> allDetails){
            this.make=make;
            this.model=model;
            this.year=year;
@@ -263,6 +310,8 @@ public class ProfileActivity extends Activity {
            this.hwy=hwy;
            this.city=city;
            this.id=id;
+           this.picture=picture;
+
            this.details = allDetails;
        }
    }
@@ -288,6 +337,7 @@ public class ProfileActivity extends Activity {
         public class ViewHolder {
             View view;
             TextView make,model,year,capacity,hwy,city;
+            ImageView image;
 
         }
 
@@ -306,6 +356,7 @@ public class ProfileActivity extends Activity {
                 holder.capacity= (TextView)view.findViewWithTag("Capacity");
                 holder.hwy= (TextView)view.findViewWithTag("Hwy");
                 holder.city= (TextView)view.findViewWithTag("City");
+                holder.image= (ImageView)view.findViewWithTag("Image");
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
@@ -317,6 +368,12 @@ public class ProfileActivity extends Activity {
             holder.capacity.setText(c.capacity);
             holder.hwy.setText(c.hwy);
             holder.city.setText(c.city);
+            if(c.picture!=null) {
+                ByteArrayInputStream imageStream = new ByteArrayInputStream(c.picture);
+                Bitmap theImage = BitmapFactory.decodeStream(imageStream);
+                holder.image.setImageBitmap(theImage);
+            }
+
             final String name = userName;
             final String setName = c.make +" "+c.model+ " Settings";
             Boolean isDefault;
@@ -376,6 +433,17 @@ public class ProfileActivity extends Activity {
                         }
                     });
                     defCheck.setChecked(curDefault);
+                    Button pictureButton = (Button) customView.findViewWithTag("Take Picture");
+                    pictureButton.setOnClickListener(new Button.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d("CarManage", "Picture Button was pressed on car " + c.make);
+                            image=holder.image;
+                            pictureCar=c;
+                            dispatchTakePictureIntent();
+                            dialog.dismiss();
+                        }
+                    });
                     TextView dataText = (TextView) customView.findViewWithTag("DataText");
                     dataText.setText("");
                     dataText.append("Year: " + c.year);

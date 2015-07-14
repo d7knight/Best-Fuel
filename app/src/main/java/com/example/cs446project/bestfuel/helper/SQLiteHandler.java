@@ -137,7 +137,8 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 				"city_mpg FLOAT, "+
 				"mixed_mpg FLOAT, "+
 				"fuel_capacity_g FLOAT, "+
-				"country TEXT )";
+				"country TEXT, " +
+				"picture BLOB )";
 		db.execSQL(CREATE_CAR_TABLE);
 		Log.d(TAG, "Database car table created");
 	}
@@ -218,7 +219,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 	public void addCar(String name, Boolean isdefault, String year, String make, String model, String id, String body, String engine_position, String engine_cc, String engine_cyl, String engine_type,
 					   String engine_valves_per_cyl, String engine_power_rpm, String engine_fuel, String top_speed_kmh, String kph0to100, String drive, String transmission, String seats, String doors, String weight_kg,
 					   String length_mm, String height_mm, String width_mm, String wheelbase_mm, String hwy_lkm, String mixed_lkm, String city_lkm, String fuel_capacity_l, String sold_in_us, String engine_hp, String top_speed_mph,
-					   String weight_ibs, String length_in, String width_in, String height_in, String hwy_mpg, String city_mpg, String mixed_mpg, String fuel_capacity_g, String country) {
+					   String weight_ibs, String length_in, String width_in, String height_in, String hwy_mpg, String city_mpg, String mixed_mpg, String fuel_capacity_g, String country, byte[] blob) {
 
 		SQLiteDatabase db = this.getWritableDatabase();
 
@@ -264,6 +265,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 		values.put("mixed_mpg", mixed_mpg);
 		values.put("fuel_capacity_g", fuel_capacity_g);
 		values.put("country", country);
+		values.put("picture", blob);
 
 		// Inserting Row
 		long idr = db.insert("car_table", null, values);
@@ -334,6 +336,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 				car.put("mixed_mpg", cursor.getString(38));
 				car.put("fuel_capacity_g", cursor.getString(39));
 				car.put("country", cursor.getString(40));
+
 				Log.d("CURSOR TEST", "cursor is " + car.get("name"));
 				Log.d("CURSOR TEST", "cursor is " + car.get("isdefault"));
 				Log.d("CURSOR TEST", "cursor is " + car.get("year"));
@@ -407,10 +410,36 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 			car.put("mixed_mpg", cursor.getString(38));
 			car.put("fuel_capacity_g", cursor.getString(39));
 			car.put("country", cursor.getString(40));
+
 		}
 		cursor.close();
 		db.close();
 		return car;
+	}
+	public void updateCarPicture( String name, String id, byte[] picture) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put("Picture", picture);
+
+
+		db.update("car_table", values, "name=? AND id=?", new String[]{name, id});
+
+
+		db.close();
+		return;
+	}
+	public byte[] getCarPicture( String name, String id) {
+		SQLiteDatabase db = this.getReadableDatabase();
+
+		String selectQuery="SELECT picture FROM car_table WHERE name=? AND id=?";
+
+
+		Cursor cursor = db.rawQuery(selectQuery,new String[]{name,id});
+
+		cursor.moveToFirst();
+        byte[] ret=cursor.getBlob(0);
+		db.close();
+		return ret;
 	}
 
 	public void defaultCarUpdate(String username, String id){

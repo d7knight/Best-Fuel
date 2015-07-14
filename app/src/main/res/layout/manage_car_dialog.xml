@@ -33,6 +33,14 @@
             android:tag="Delete"
             android:text="Delete Car" />
     </LinearLayout>
+    <Button
+        android:id="@+id/picbutton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#0099CC"
+        android:textColor="#FFFFFF"
+        android:tag="Take Picture"
+        android:text="Take Picture" />
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="156dp"
