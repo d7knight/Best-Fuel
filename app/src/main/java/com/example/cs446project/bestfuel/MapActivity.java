@@ -74,19 +74,20 @@ public class MapActivity extends Activity {
         MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
             @Override
             public void gotLocation(Location newLocation){
-                location=newLocation;
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                Toast.makeText(mContext, "Gps data "+latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+                if(newLocation!=null) {
+                    location = newLocation;
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    Toast.makeText(mContext, "Gps data " + latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+                }
             }
         };
         MyLocation myLocation = new MyLocation();
         myLocation.getLocation(this, locationResult);
 
-        MapActivity.clearCache(mContext,0);
+
 
         WebView webview=(WebView)findViewById(R.id.webkit);
-        webview.clearCache(true);
         webview.getSettings().setJavaScriptEnabled(true);
         //Inject WebAppInterface methods into Web page by having Interface name 'Android'
         waInterface = new WebAppInterface(this, webview);
@@ -105,10 +106,7 @@ public class MapActivity extends Activity {
             saCreated = true;
         }
 
-        Map<String, String> noCacheHeaders = new HashMap<String, String>(2);
-        noCacheHeaders.put("Pragma", "no-cache");
-        noCacheHeaders.put("Cache-Control", "no-cache");
-        webview.loadUrl(AppConfig.URL_MAP,noCacheHeaders);
+        webview.loadUrl(AppConfig.URL_MAP);
 
 
 
@@ -337,6 +335,15 @@ public class MapActivity extends Activity {
             if(location==null){
                 Log.d("gps","error");
                 Toast.makeText(mContext, "Javascript requested location but location not ready yet", Toast.LENGTH_SHORT).show();
+                webview.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        webview.loadUrl("javascript:sendMode('" + mode + "')");
+                        webview.loadUrl("javascript:sendPlacePreferences('" + getUserPrefs() + "')");
+
+
+                    }
+                });
             }
             else{
                 final double latitude = location.getLatitude();
@@ -368,45 +375,7 @@ public class MapActivity extends Activity {
             return prefs;
         }
     }
-    //helper method for clearCache() , recursive
-//returns number of deleted files
-    static int clearCacheFolder(final File dir, final int numDays) {
 
-        int deletedFiles = 0;
-        if (dir!= null && dir.isDirectory()) {
-            try {
-                for (File child:dir.listFiles()) {
-
-                    //first delete subdirectories recursively
-                    if (child.isDirectory()) {
-                        deletedFiles += clearCacheFolder(child, numDays);
-                    }
-
-                    //then delete the files and subdirectories in this dir
-                    //only empty directories can be deleted, so subdirs have been done first
-                    if (child.lastModified() < new Date().getTime() - numDays * DateUtils.DAY_IN_MILLIS) {
-                        if (child.delete()) {
-                            deletedFiles++;
-                        }
-                    }
-                }
-            }
-            catch(Exception e) {
-                Log.e("map", String.format("Failed to clean the cache, error %s", e.getMessage()));
-            }
-        }
-        return deletedFiles;
-    }
-
-    /*
-     * Delete the files older than numDays days from the application cache
-     * 0 means all files.
-     */
-    public static void clearCache(final Context context, final int numDays) {
-        Log.i("MAP", String.format("Starting cache prune, deleting files older than %d days", numDays));
-        int numDeletedFiles = clearCacheFolder(context.getCacheDir(), numDays);
-        Log.i("MAP", String.format("Cache pruning completed, %d files deleted", numDeletedFiles));
-    }
 
 
 }
