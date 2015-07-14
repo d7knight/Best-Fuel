@@ -2,6 +2,7 @@ package com.example.cs446project.bestfuel;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,8 +28,13 @@ import com.example.cs446project.bestfuel.helper.MyLocation;
 import com.example.cs446project.bestfuel.helper.SQLiteHandler;
 import com.example.cs446project.bestfuel.helper.StationAlgorithm;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.security.Provider;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +50,7 @@ public class MapActivity extends Activity {
     Context mContext;
     String mode;
     String preferences;
+    private SQLiteHandler db;
 
 
 
@@ -89,7 +96,7 @@ public class MapActivity extends Activity {
 
         Log.d("Main", "Main activity loaded");
 
-        SQLiteHandler db = new SQLiteHandler(getApplicationContext());
+        db = new SQLiteHandler(getApplicationContext());
 
 
         if(saCreated==false) {
@@ -139,6 +146,80 @@ public class MapActivity extends Activity {
 
     public void stationBypass(int bestStation){
         waInterface.sendStationResult(this.sa.result, bestStation);
+    }
+
+    public JSONObject grabPrefs(){
+        HashMap<String, String> user = db.getUserDetails();
+        ContentValues prefs = db.getPrefs(user.get("name"));
+        JSONObject prefObj = new JSONObject();
+        ArrayList<String> prefList = new ArrayList<String>();
+        if(prefs.getAsBoolean("airport")){
+            prefList.add("airport");
+        }
+        if(prefs.getAsBoolean("atm")){
+            prefList.add("atm");
+        }
+        if(prefs.getAsBoolean("bakery")){
+            prefList.add("bakery");
+        }
+        if(prefs.getAsBoolean("bank")){
+            prefList.add("bank");
+        }
+        if(prefs.getAsBoolean("bar")){
+            prefList.add("bar");
+        }
+        if(prefs.getAsBoolean("cafe")){
+            prefList.add("cafe");
+        }
+        if(prefs.getAsBoolean("car_dealer")){
+            prefList.add("car_dealer");
+        }
+        if(prefs.getAsBoolean("car_wash")){
+            prefList.add("car_wash");
+        }
+        if(prefs.getAsBoolean("convenience_store")){
+            prefList.add("convenience_store");
+        }
+        if(prefs.getAsBoolean("food")){
+            prefList.add("food");
+        }
+        if(prefs.getAsBoolean("hospital")){
+            prefList.add("hospital");
+        }
+        if(prefs.getAsBoolean("liquor_store")){
+            prefList.add("liquor_store");
+        }
+        if(prefs.getAsBoolean("lodging")){
+            prefList.add("lodging");
+        }
+        if(prefs.getAsBoolean("meal_delivery")){
+            prefList.add("meal_delivery");
+        }
+        if(prefs.getAsBoolean("park")){
+            prefList.add("park");
+        }
+        if(prefs.getAsBoolean("parking")){
+            prefList.add("parking");
+        }
+        if(prefs.getAsBoolean("restaurant")){
+            prefList.add("restaurant");
+        }
+        if(prefs.getAsBoolean("shopping_mall")){
+            prefList.add("shopping_mall");
+        }
+
+
+        try {
+            prefObj.put("price", prefs.getAsInteger("price"));
+            prefObj.put("open", prefs.getAsBoolean("open_only"));
+            prefObj.put("fuel_type", prefs.getAsInteger("fuel_type"));
+            prefObj.put("places", new JSONArray(prefList));
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return prefObj;
     }
 
 
@@ -279,6 +360,11 @@ public class MapActivity extends Activity {
         public void switchToProfile() {
             Intent intent = new Intent(MapActivity.this, ProfileActivity.class);
             startActivity(intent);
+        }
+
+        public JSONObject getUserPrefs(){
+            JSONObject prefs=grabPrefs();
+            return prefs;
         }
     }
     //helper method for clearCache() , recursive
