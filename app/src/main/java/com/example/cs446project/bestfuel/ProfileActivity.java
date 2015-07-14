@@ -192,9 +192,9 @@ public class ProfileActivity extends Activity {
                         e.printStackTrace();
                     }
                     HashMap<String, String> recentCar = db.getCar(false, name, Integer.parseInt(id));
-                    resetCars();
-                    //adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city, id, recentCar));
-                    //adapter.notifyDataSetChanged();
+
+                    adapter.add(new Car(setMake, setModel, Integer.toString(setYear), cap, hwy, city, id,null, recentCar));
+                    adapter.notifyDataSetChanged();
                     addDialog.dismiss();
                 }
             }
@@ -226,7 +226,13 @@ public class ProfileActivity extends Activity {
     public void resetCars(){
         arraylist.clear();
         adapter.clear();
+
+        // Pass results to ListViewAdapter Class
         adapter = new CarAdapter(this, arraylist);
+
+        list.setAdapter(adapter);
+
+
         populateCars(userName, db);
     }
     static final int REQUEST_IMAGE_CAPTURE = 1;
