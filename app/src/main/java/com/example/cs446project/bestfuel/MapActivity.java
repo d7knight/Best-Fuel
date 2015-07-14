@@ -49,7 +49,7 @@ public class MapActivity extends Activity {
     LocationManager locationManager;
     Context mContext;
     String mode;
-    String preferences;
+
     private SQLiteHandler db;
 
 
@@ -346,9 +346,10 @@ public class MapActivity extends Activity {
                 webview.post(new Runnable() {
                     @Override
                     public void run() {
-                        webview.loadUrl("javascript:sendCurLocation('" + latitude + "','" + longitude + "')");
                         webview.loadUrl("javascript:sendMode('" + mode + "')");
-                        webview.loadUrl("javascript:sendPlacePreferences('" + preferences + "')");
+                        webview.loadUrl("javascript:sendPlacePreferences('" + getUserPrefs() + "')");
+                        webview.loadUrl("javascript:sendCurLocation('" + latitude + "','" + longitude + "')");
+
                     }
                 });
 
