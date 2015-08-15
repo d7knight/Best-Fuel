@@ -9,6 +9,7 @@ Our application has the following capabilities:
 4. Record and store vehicle profiles 
 5. Record gas prices for recent gas station visits 
 
+
 My partners and I plan to continue working on this app even after this term is over and eventually put it inside the Google Play Store. 
 
 Currently our app can run on Android, Blackberry we also plan to have Windows Phone support. 
