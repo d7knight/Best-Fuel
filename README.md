@@ -15,6 +15,8 @@ Our application has the following capabilities:
 
 5. Record gas prices for recent gas station visits
 
+6. For our Pivot, we were asked to allow users to find nearby Food Places along a route. We implemented this functionality by using google places API and allowing users to set preferences for food places in the profile page.  
+
 My partners and I plan to continue working on this app even after this term is over and eventually put it inside the Google Play Store. 
 
 Currently our app can run on Android, Blackberry we also plan to have Windows Phone support. 
